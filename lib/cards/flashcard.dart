@@ -22,7 +22,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 100),
     );
 
     _flipAnimation = Tween<double>(begin: 0.0, end: pi).animate(
@@ -31,7 +31,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
 
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        _isFront = !_isFront; // Toggle card side
+        _isFront = !_isFront; 
         _controller.reset();
       }
     });
@@ -46,7 +46,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _switchCard,
+      onTap: _runAnimation,
       child: AnimatedBuilder(
         animation: _flipAnimation,
         builder: (context, child) {
@@ -59,6 +59,8 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
     );
   }
 
+  //function takes in a bool thats true if term and false if definition
+  //creates the card flip animation
   Widget _buildTransform(bool isFront){
     String frontText;
     String backText;
@@ -87,19 +89,25 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
     );
   }
 
+
+  //creates the card within the transformation
   Widget _buildCard(String text, Color? color) {
-    return Card(
+    return Container(
       color: color,
-      child: Center(
-        child: Text(
-          text,
-          style: const TextStyle(color: Colors.white, fontSize: 20),
+      child: Card(
+        color: color,
+        child: Center(
+          child: Text(
+            text,
+            style: const TextStyle(color: Colors.white, fontSize: 20),
+          ),
         ),
       ),
     );
   }
 
-  void _switchCard() {
+  //runs the animation
+  void _runAnimation() {
     if (_controller.isAnimating) return;
     _controller.forward();
   }

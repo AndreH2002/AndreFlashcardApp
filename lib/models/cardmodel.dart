@@ -7,3 +7,4 @@ class CardModel {
     this.definition
   });
 }
+

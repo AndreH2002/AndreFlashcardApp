@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +38,7 @@ class _DeckPageState extends State<DeckPage> {
       ),
       body: Column(  
         children: [  
-          Container(
+          SizedBox(
             height: 250,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -51,9 +49,11 @@ class _DeckPageState extends State<DeckPage> {
                 itemBuilder: (context, index) {
                   return Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Container(width: 250, color: Colors.blue[700], child: 
-                      Flashcard(frontText: '${listOfCards.elementAt(index).term}', 
-                                  backText: '${listOfCards.elementAt(index).definition}')),
+                    child: SizedBox(
+                      width: 225,
+                      child: Flashcard(frontText: '${listOfCards.elementAt(index).term}', 
+                                  backText: '${listOfCards.elementAt(index).definition}'),
+                    ),
                   );
               },),
             ),
@@ -62,7 +62,6 @@ class _DeckPageState extends State<DeckPage> {
 
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
-            child: Container(
               child: Column(
                 children: [
                   Row(
@@ -74,11 +73,11 @@ class _DeckPageState extends State<DeckPage> {
                   ),
                   Text('${listOfCards.length} Terms', style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
-              )),
+              ),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Container(  
+            child: SizedBox(  
               height: 200,
               child: ListView(  
                 children: [ 
@@ -86,25 +85,25 @@ class _DeckPageState extends State<DeckPage> {
                     padding: const EdgeInsets.all(3.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Flashcards', textScaleFactor: 2.0))),
+                      child: Container(color: Colors.blue[700],child: const Text('Flashcards', textScaler: TextScaler.linear(2.0)))),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(3.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Learn', textScaleFactor: 2.0))),
+                      child: Container(color: Colors.blue[700],child: const Text('Learn', textScaler: TextScaler.linear(2.0)))),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(3.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Test', textScaleFactor: 2.0))),
+                      child: Container(color: Colors.blue[700],child: const Text('Test', textScaler: TextScaler.linear(2.0)))),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(3.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700], child: const Text('Match', textScaleFactor: 2.0))),
+                      child: Container(color: Colors.blue[700], child: const Text('Match', textScaler: TextScaler.linear(2.0)))),
                   ),
               ],
             ),
