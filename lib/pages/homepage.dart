@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../models/deckmodel.dart';
-import '../providers/provider.dart';
+import '../services/deckprovider.dart';
 import 'createpage.dart';
 import '../models/cardmodel.dart';
 import 'deckpage.dart';
@@ -13,7 +12,22 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
 class _HomePageState extends State<HomePage> {
+
+String dataFetchAttempt = "";
+
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies(); 
+  fetchAttempt();
+}
+
+Future<void> fetchAttempt() async {
+  dataFetchAttempt = await context.watch<DeckService>().getDeckList();
+  setState(() {}); 
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,35 +49,47 @@ class _HomePageState extends State<HomePage> {
           ),
           
           Center(child: _buildHeader()),
+
           Expanded(
-            child: SingleChildScrollView(child: _formRows(context.watch<DeckProvider>().listOfDecks)),
+            child: 
+            dataFetchAttempt == "OK"
+            ? _formRows()
+            : Text('No data'),
           ),
         ],
       ),
     );
   }
 
-  Widget _formRows(List<DeckModel> listOfDeckModels) {
-    return ListView.builder(
-      shrinkWrap: true,
-      itemCount: listOfDeckModels.length,
-      itemBuilder: (context, index) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(  
-              context,
-              MaterialPageRoute(builder: (context) => DeckPage(deckIndex: index),
-              ),
+  Widget _formRows() {
+    return Consumer<DeckService> (
+      builder: (context, value, child) {
+      return ListView.builder (
+          itemCount: value.listOfDecks.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+                onTap: () {
+                Navigator.push(  
+                  context,
+                  MaterialPageRoute(builder: (context) => DeckPage(deckIndex: index),
+                  ),
+                );
+              },
+              child: buildRow(
+                value.listOfDecks[index].deckname,
+                value.listOfDecks[index].numOfCards,
+              )
             );
-          },
-          child: buildRow(
-            listOfDeckModels[index].deckname,
-            listOfDeckModels[index].numOfCards,
-          ),
+          }
         );
-      },
+      }
     );
-  }
+  } 
+    
+      
+      
+    
+  
 
   Widget buildRow(String deckname, int numOfCards) {
     return Container(

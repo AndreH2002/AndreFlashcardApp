@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../cards/flashcard.dart';
 import '../models/cardmodel.dart';
 import '../models/deckmodel.dart';
-import '../providers/provider.dart';
+import '../services/deckprovider.dart';
 
 class DeckPage extends StatefulWidget {
   final int deckIndex;
@@ -26,7 +26,7 @@ class _DeckPageState extends State<DeckPage> {
 
   @override
   void didChangeDependencies() {
-    deckModel = context.watch<DeckProvider>().listOfDecks.elementAt(widget.deckIndex);
+    deckModel = context.watch<DeckService>().listOfDecks.elementAt(widget.deckIndex);
     listOfCards = deckModel.listOfCards;
     super.didChangeDependencies();
   }

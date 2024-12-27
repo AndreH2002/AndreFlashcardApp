@@ -22,7 +22,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 100),
+      duration: const Duration(milliseconds: 500),
     );
 
     _flipAnimation = Tween<double>(begin: 0.0, end: pi).animate(
