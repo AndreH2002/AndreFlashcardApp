@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 import '../cards/flashcard.dart';
 import '../models/cardmodel.dart';
 import '../models/deckmodel.dart';
-import '../services/deckprovider.dart';
+import 'matchpage.dart';
 
 class DeckPage extends StatefulWidget {
-  final int deckIndex;
-  const DeckPage({super.key, required this.deckIndex});
+  final DeckModel deckModel;
+  const DeckPage({super.key, required this.deckModel});
 
   @override
   State<DeckPage> createState() => _DeckPageState();
@@ -26,10 +24,12 @@ class _DeckPageState extends State<DeckPage> {
 
   @override
   void didChangeDependencies() {
-    deckModel = context.watch<DeckService>().listOfDecks.elementAt(widget.deckIndex);
+    deckModel = widget.deckModel;
     listOfCards = deckModel.listOfCards;
     super.didChangeDependencies();
   }
+
+ 
   @override
   Widget build(BuildContext context) {
     return Scaffold(  
@@ -103,7 +103,13 @@ class _DeckPageState extends State<DeckPage> {
                     padding: const EdgeInsets.all(3.0),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700], child: const Text('Match', textScaler: TextScaler.linear(2.0)))),
+                      child: GestureDetector(
+                        onTap:() {
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => MatchPage()));
+                        },
+                        child: Container(color: Colors.blue[700], child: const Text('Match', textScaler: TextScaler.linear(2.0)))
+                        )
+                      ),
                   ),
               ],
             ),

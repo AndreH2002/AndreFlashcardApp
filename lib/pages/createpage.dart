@@ -23,8 +23,14 @@ class _CreatePageState extends State<CreatePage> {
     listOfCards = List.from(widget.listOfCards);
   }
 
-  Future<String> _addDeckAttempt(DeckModel model) async {
-    return await context.read<DeckService>().addDeck(model);
+  Future<bool> _addDeckAttempt(DeckModel model) async {
+    String attempt = await context.read<DeckService>().addDeck(model);
+    if(attempt == "OK") {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   @override
@@ -49,10 +55,15 @@ class _CreatePageState extends State<CreatePage> {
                 listOfCards: listOfCards,
                 numOfCards: listOfCards.length,
               );
-              await _addDeckAttempt(modelToSubmit);
-              if(mounted){
+             if (await _addDeckAttempt(modelToSubmit) == true && context.mounted) {
                 Navigator.pop(context);
               }
+              else {
+                ScaffoldMessenger.of(context).showSnackBar(  
+                  const SnackBar(content: Text('Failed to add deck'))
+                );
+              }
+              
             },
             child: const Text('Done'),
           ),
