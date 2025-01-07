@@ -57,6 +57,8 @@ class DatabaseService {
           FOREIGN KEY (${CardFields.listDeckID}) REFERENCES $decksTable (${DeckFields.deckID})
         )
         ''');
+
+        
   }
 
   Future _onConfigure(Database db) async {
@@ -169,5 +171,7 @@ class DatabaseService {
     return false;
   }
  }
+
+ //methods for displaying the top 10 times
 
 }

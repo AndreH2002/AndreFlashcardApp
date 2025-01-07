@@ -105,7 +105,7 @@ class _DeckPageState extends State<DeckPage> {
                       borderRadius: BorderRadius.circular(10),
                       child: GestureDetector(
                         onTap:() {
-                          Navigator.push(context, MaterialPageRoute(builder:(context) => MatchPage()));
+                          Navigator.push(context, MaterialPageRoute(builder:(context) => MatchPage(deckModel: deckModel,)));
                         },
                         child: Container(color: Colors.blue[700], child: const Text('Match', textScaler: TextScaler.linear(2.0)))
                         )
