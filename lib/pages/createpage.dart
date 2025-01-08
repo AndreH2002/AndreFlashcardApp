@@ -5,6 +5,7 @@ import '../cards/creationcard.dart';
 import '../models/deckmodel.dart';
 import '../services/deckprovider.dart';
 
+
 class CreatePage extends StatefulWidget {
   const CreatePage({super.key, required this.listOfCards});
   final List<CardModel> listOfCards;
@@ -23,65 +24,94 @@ class _CreatePageState extends State<CreatePage> {
     listOfCards = List.from(widget.listOfCards);
   }
 
+  //adds the deck through the try catch method definded in deckservice
   Future<bool> _addDeckAttempt(DeckModel model) async {
     String attempt = await context.read<DeckService>().addDeck(model);
-    if(attempt == "OK") {
-      return true;
-    }
-    else {
-      return false;
-    }
+    return attempt == "OK";
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF4F5FC),
       appBar: AppBar(
-        title: Text(
-          titleString,
-          overflow: TextOverflow.ellipsis,
+        title: const Text(
+          'Create Deck',
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
         ),
+        backgroundColor: const Color(0xFF3B038A),
         actions: [
-          ElevatedButton(
+          TextButton(
             onPressed: () async {
+
+              //checks for empty title or list
               if (titleString.isEmpty || listOfCards.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Deck title or cards cannot be empty')),
                 );
                 return;
               }
+
+              //checks for duplicate title string
+              if(await context.read<DeckService>().deckNameExists(titleString)) {
+                if(context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar( 
+                  const SnackBar(content: Text('Deck title already exists or failure to add deck')),
+                );
+                }
+                return;
+              }
+
+              //tries to add deck from database
               final modelToSubmit = DeckModel(
                 deckname: titleString,
                 listOfCards: listOfCards,
                 numOfCards: listOfCards.length,
               );
-             if (await _addDeckAttempt(modelToSubmit) == true && context.mounted) {
+              if (await _addDeckAttempt(modelToSubmit) && context.mounted) {
                 Navigator.pop(context);
-              }
-              else {
-                ScaffoldMessenger.of(context).showSnackBar(  
-                  const SnackBar(content: Text('Failed to add deck'))
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Failed to add deck')),
                 );
               }
-              
             },
-            child: const Text('Done'),
+            child: const Text(
+              'Done',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
       body: Column(
         children: [
+
+          //title field
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(16.0),
             child: TextField(
-              decoration: const InputDecoration(labelText: 'Title'),
+              decoration: InputDecoration(
+                labelText: 'Deck Title',
+                labelStyle: const TextStyle(fontSize: 18, color: Colors.black54),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
               onChanged: (value) => setState(() => titleString = value),
             ),
           ),
+
+          //builder of all the different creation cards
           Expanded(
             child: listOfCards.isEmpty
-                ? Center(child: Text('No cards added yet.'))
+                ? const Center(
+                    child: Text(
+                      'No cards added yet.',
+                      style: TextStyle(fontSize: 18, color: Colors.black54),
+                    ),
+                  )
                 : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     itemCount: listOfCards.length,
                     itemBuilder: (context, index) {
                       return Padding(
@@ -91,23 +121,43 @@ class _CreatePageState extends State<CreatePage> {
                     },
                   ),
           ),
+          const SizedBox(height: 8),
+
+          // bottom row
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              IconButton(
+
+              //add button
+              ElevatedButton.icon(
                 onPressed: () => setState(() => listOfCards.add(CardModel())),
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('Add Card'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF7D5FFF),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
               ),
-              IconButton(
+
+              //remove last button
+              ElevatedButton.icon(
                 onPressed: () {
                   if (listOfCards.isNotEmpty) {
                     setState(() => listOfCards.removeLast());
                   }
                 },
-                icon: const Icon(Icons.remove_circle),
+                icon: const Icon(Icons.remove_circle, size: 20),
+                label: const Text('Remove Last'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
               ),
             ],
           ),
+          const SizedBox(height: 16),
         ],
       ),
     );

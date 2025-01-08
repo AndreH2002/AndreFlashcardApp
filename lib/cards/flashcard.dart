@@ -80,29 +80,35 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
               child: _flipAnimation.value <= pi / 2
                   ? _buildCard(
                     frontText,
-                    Colors.blue[700])
+                    )
                   : Transform(
                      alignment: Alignment.center,
                       transform: Matrix4.identity()..rotateY(pi),
-                      child: _buildCard(backText, Colors.blue[700]),
+                      child: _buildCard(backText),
                     ),
     );
   }
 
 
   //creates the card within the transformation
-  Widget _buildCard(String text, Color? color) {
+  Widget _buildCard(String text) {
     return Container(
-      color: color,
-      child: Card(
-        color: color,
-        child: Center(
-          child: Text(
+      decoration: BoxDecoration( 
+        gradient: const LinearGradient(
+                    colors: [Color(0xFF7D5FFF), Color(0xFFB17FFF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+        ),
+
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Center(
+            child: Text(
             text,
             style: const TextStyle(color: Colors.white, fontSize: 20),
-          ),
-        ),
+            ),
       ),
+      
     );
   }
 

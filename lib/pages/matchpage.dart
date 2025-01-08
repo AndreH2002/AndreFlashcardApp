@@ -37,11 +37,7 @@ class _MatchPageState extends State<MatchPage> {
 
   MatchCard? clickedCard; //no cards initially clicked
   
-  Color unclicked = Colors.blue;
-  Color clicked = Colors.purple;
-  Color matched = Colors.green;
-  Color wrong = Colors.red;
-
+  
   @override
   void initState() {
     super.initState();
@@ -86,7 +82,8 @@ class _MatchPageState extends State<MatchPage> {
         context.read<TimerProvider>().resetTime();
       },
       child: Scaffold(  
-       appBar: AppBar(  
+       appBar: AppBar( 
+        backgroundColor: Colors.indigo, 
          title: Row( 
            mainAxisAlignment: MainAxisAlignment.end,
            children: [
@@ -94,46 +91,77 @@ class _MatchPageState extends State<MatchPage> {
            ]
          )
        ),
-       body: Column(
-         children: [
-      
-           Visibility(visible: displayFinal, child: finalTime),
-      
-           Expanded(
-             child: GridView.builder(gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount
-             (
-               childAspectRatio: 0.71,
-               crossAxisCount: 3
-             ), 
-             itemCount: currentModel.matchCardList.length,
-             itemBuilder: (context, index) {
-               return Padding(
-                 padding: const EdgeInsets.all(8.0),
-                 child: GestureDetector(
-                   onTap:() {
-                     MatchCard currentCard = currentModel.matchCardList[index];
-                     if(currentModel.colorList[index] == unclicked) {
-                       _manageStatus(currentCard);
-                     }
-                   },
-                   child: Visibility(
-                     visible: currentModel.visibleList[index],
-                     child: ColoredBox(
-                       color: currentModel.colorList[index],
-                       child: MatchCard( 
-                       
-                         text: currentModel.matchCardList[index].text,
-                       ),
-                     ),
-                   ),
-                 ),
-               );
-             }),
-           ),
-         ],
-       )
+        body: Stack(
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Colors.blueAccent, Colors.purpleAccent],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
+          Column(
+            children: [
+              Visibility(visible: displayFinal, child: finalTime),
+              Expanded(
+                child: GridView.builder(
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    childAspectRatio: 0.71,
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  itemCount: currentModel.matchCardList.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        MatchCard currentCard = currentModel.matchCardList[index];
+                        if (currentModel.colorList[index] == currentModel.unclicked) {
+                          _manageStatus(currentCard);
+                        }
+                      },
+                      child: Visibility(
+                        visible: currentModel.visibleList[index],
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 300),
+                          decoration: BoxDecoration(
+                            color: currentModel.colorList[index],
+                            borderRadius: BorderRadius.circular(10),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                blurRadius: 4,
+                                offset: const Offset(2, 2),
+                              ),
+                            ],
+                          ),
+                          child: Center(
+                            child: Text(
+                              currentModel.matchCardList[index].text,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
             ),
     );
+
   }
 
   void _manageStatus(MatchCard card) {
@@ -143,16 +171,16 @@ class _MatchPageState extends State<MatchPage> {
       if(clickedCard == null) {
         setState(() {
           clickedCard = card;
-          currentModel.colorList[cardIndex] = clicked;
+          currentModel.colorList[cardIndex] = currentModel.clicked;
         });
       } 
       else {
         if(partner != null) {
           int partnerIndex = currentModel.matchCardList.indexOf(partner);
-            if(clickedCard == partner && currentModel.colorList[partnerIndex] == clicked) {
+            if(clickedCard == partner && currentModel.colorList[partnerIndex] == currentModel.clicked) {
               setState(() {
-                currentModel.colorList[cardIndex] = matched;
-                currentModel.colorList[partnerIndex] = matched;
+                currentModel.colorList[cardIndex] = currentModel.matched;
+                currentModel.colorList[partnerIndex] = currentModel.matched;
                 clickedCard = null;
                 pairsLeft--;
                 
@@ -181,14 +209,14 @@ class _MatchPageState extends State<MatchPage> {
             else {
               int clickedIndex = currentModel.matchCardList.indexOf(clickedCard!);
               setState(() {
-                currentModel.colorList[cardIndex] = wrong;
-                currentModel.colorList[clickedIndex] = wrong;
+                currentModel.colorList[cardIndex] = currentModel.wrong;
+                currentModel.colorList[clickedIndex] = currentModel.wrong;
               });
 
                Future.delayed(const Duration(milliseconds: 200), () {
                 setState(() {
-                  currentModel.colorList[cardIndex] = unclicked;
-                  currentModel.colorList[clickedIndex] = unclicked;
+                  currentModel.colorList[cardIndex] = currentModel.unclicked;
+                  currentModel.colorList[clickedIndex] = currentModel.unclicked;
                 });
               });
             }
@@ -218,7 +246,7 @@ class _MatchPageState extends State<MatchPage> {
 
    
         for (int i = 0; i < currentModel.colorList.length; i++) {
-          currentModel.colorList[i] = unclicked;
+          currentModel.colorList[i] = currentModel.unclicked;
         }
 
         _startTime();

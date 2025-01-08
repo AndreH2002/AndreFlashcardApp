@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../cards/flashcard.dart';
 import '../models/cardmodel.dart';
 import '../models/deckmodel.dart';
+import 'flashcardpage.dart';
+import 'learnpage.dart';
 import 'matchpage.dart';
 
 class DeckPage extends StatefulWidget {
@@ -14,11 +16,10 @@ class DeckPage extends StatefulWidget {
 
 class _DeckPageState extends State<DeckPage> {
   late DeckModel deckModel;
-  late List<CardModel>listOfCards;
+  late List<CardModel> listOfCards;
 
   @override
   void initState() {
-    
     super.initState();
   }
 
@@ -29,15 +30,29 @@ class _DeckPageState extends State<DeckPage> {
     super.didChangeDependencies();
   }
 
- 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(  
-      appBar: AppBar(  
-        
+    return Scaffold(
+      backgroundColor: const Color(0xFFf3f4f9),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF3b038a),
+        title: Text(
+          deckModel.deckname,
+          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            onPressed: () {
+              //TODO: add download logic
+            },
+            icon: const Icon(Icons.download, color: Colors.white),
+          ),
+        ],
       ),
-      body: Column(  
-        children: [  
+      body: Column(
+        children: [
+          // Scrollview for the flashcards horitzontal
           SizedBox(
             height: 250,
             child: SingleChildScrollView(
@@ -51,73 +66,139 @@ class _DeckPageState extends State<DeckPage> {
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
                       width: 225,
-                      child: Flashcard(frontText: '${listOfCards.elementAt(index).term}', 
-                                  backText: '${listOfCards.elementAt(index).definition}'),
+                      child: Flashcard(
+                        frontText: listOfCards[index].term!,
+                        backText: listOfCards[index].definition!,
+                      ),
                     ),
                   );
-              },),
+                },
+              ),
             ),
           ),
-          
 
+
+          // Deck Info Section
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(deckModel.deckname, style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),),
-                      const IconButton(onPressed: null, icon: Icon(Icons.download)),
-                    ],
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            child: Column(
+              children: [
+                Text(
+                  deckModel.deckname,
+                  style: const TextStyle(
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  Text('${listOfCards.length} Terms', style: const TextStyle(fontWeight: FontWeight.bold)),
-                ],
-              ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(  
-              height: 200,
-              child: ListView(  
-                children: [ 
-                  Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Flashcards', textScaler: TextScaler.linear(2.0)))),
+                ),
+                Text(
+                  '${listOfCards.length} Terms',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w500,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Learn', textScaler: TextScaler.linear(2.0)))),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(color: Colors.blue[700],child: const Text('Test', textScaler: TextScaler.linear(2.0)))),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(3.0),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(10),
-                      child: GestureDetector(
-                        onTap:() {
-                          Navigator.push(context, MaterialPageRoute(builder:(context) => MatchPage(deckModel: deckModel,)));
-                        },
-                        child: Container(color: Colors.blue[700], child: const Text('Match', textScaler: TextScaler.linear(2.0)))
-                        )
-                      ),
-                  ),
+                ),
               ],
             ),
+          ),
+          // Navigation Options Section
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ListView(
+                children: [
+                  _buildNavigationOption(
+                    
+                    label: 'Flashcards',
+                    onTap: () {
+                      if(listOfCards.isNotEmpty) {
+                        Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FlashcardPage(deckModel: deckModel),
+                        ),
+                      );
+                      }
+                      
+                    },
+                  ),
+                  _buildNavigationOption(
+                    label: 'Learn',
+                    onTap: () {
+                      if(listOfCards.isNotEmpty) {
+                         Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LearnPage(deckModel: deckModel),
+                        ),
+                      );
+                      }
+                     
+                    },
+                  ),
+                  _buildNavigationOption(
+                    label: 'Test',
+                    onTap: () {
+                      //TODO: Add Test Page Navigation
+                    },
+                  ),
+                  _buildNavigationOption(
+                    label: 'Match',
+                    onTap: () {
+                      if(listOfCards.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MatchPage(deckModel: deckModel),
+                        ),
+                      );
+                      }
+                      else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Error, list is empty'),),
+                        );
+
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
-
-
         ],
+      ),
+    );
+  }
+
+  Widget _buildNavigationOption({required String label, required VoidCallback onTap}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 60,
+          decoration: BoxDecoration(
+            color: const Color(0xFF7D5FFF),
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 6,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          alignment: Alignment.center,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ),
       ),
     );
   }

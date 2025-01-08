@@ -79,15 +79,17 @@ Future<String> getDeckList() async {
   return "OK";
 }
 
-Future<String> deckNameExists(String name) async {
+Future<bool> deckNameExists(String name) async {
+  bool exists = true;
   try {
-    await DatabaseService.instance.deckNameExists(name);
+    exists = await DatabaseService.instance.deckNameExists(name);
+    
     notifyListeners();
   }
   catch(e) {
-    return e.toString();
+    return true;
   }
-  return "OK";
+  return exists;
 }
 
 }

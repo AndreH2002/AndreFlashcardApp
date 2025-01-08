@@ -11,10 +11,10 @@ class MatchGameModel {
   late final List<Color> colorList;
   late final List<bool> visibleList;
 
-  final Color unclicked = Colors.blue;
-  final Color clicked = Colors.purple;
-  final Color matched = Colors.green;
-  final Color wrong = Colors.red;
+  final Color unclicked = Colors.blue.shade300;
+  final Color clicked = Colors.purple.shade300;
+  final Color matched = Colors.green.shade400;
+  final Color wrong = Colors.red.shade400;
 
   MatchGameModel({
     required this.numOfCards,
@@ -29,7 +29,8 @@ class MatchGameModel {
     int cardsLeft = numOfCards;
     List<CardModel> cardCopy = List.from(listOfCards);
     List<MatchCard> listToReturn = [];
-
+    
+    //if there are less than or equal to 6 cards in the list all the cards will be included in the game
     if (cardCopy.length <= 6) {
       for (int i = 0; i < cardsLeft; i++) {
         MatchCard term = MatchCard(text: cardCopy[i].term!);
@@ -42,6 +43,8 @@ class MatchGameModel {
         listToReturn.add(definition);
       }
     } else {
+
+      // otherwise we pick 6 random cards
       while (cardsLeft > 0) {
         int randomIndex = Random().nextInt(cardsLeft);
 
