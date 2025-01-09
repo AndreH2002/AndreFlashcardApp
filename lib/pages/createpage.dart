@@ -53,7 +53,7 @@ class _CreatePageState extends State<CreatePage> {
               }
 
               //checks for duplicate title string
-              if(await context.read<DeckService>().deckNameExists(titleString)) {
+              else if(await context.read<DeckService>().deckNameExists(titleString)) {
                 if(context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar( 
                   const SnackBar(content: Text('Deck title already exists or failure to add deck')),
@@ -61,8 +61,11 @@ class _CreatePageState extends State<CreatePage> {
                 }
                 return;
               }
+              else {
+
 
               //tries to add deck from database
+              _checkForNullTerms(listOfCards);
               final modelToSubmit = DeckModel(
                 deckname: titleString,
                 listOfCards: listOfCards,
@@ -71,10 +74,14 @@ class _CreatePageState extends State<CreatePage> {
               if (await _addDeckAttempt(modelToSubmit) && context.mounted) {
                 Navigator.pop(context);
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
+                if(mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to add deck')),
                 );
+                }
               }
+              }
+             
             },
             child: const Text(
               'Done',
@@ -102,6 +109,7 @@ class _CreatePageState extends State<CreatePage> {
           ),
 
           //builder of all the different creation cards
+
           Expanded(
             child: listOfCards.isEmpty
                 ? const Center(
@@ -124,6 +132,7 @@ class _CreatePageState extends State<CreatePage> {
           const SizedBox(height: 8),
 
           // bottom row
+
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -161,5 +170,10 @@ class _CreatePageState extends State<CreatePage> {
         ],
       ),
     );
+  }
+
+  //we need a function to remove any cards that don't have any text in the term or definition
+  void _checkForNullTerms(List<CardModel>listToCheck) {
+    listToCheck.removeWhere((element) => element.term == null || element.definition == null);
   }
 }
