@@ -122,9 +122,20 @@ class _CreatePageState extends State<CreatePage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     itemCount: listOfCards.length,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: CreationCard(model: listOfCards[index]),
+                      return Dismissible(
+                        key: UniqueKey(),
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: const Icon(Icons.delete, color: Colors.white),
+                        ),
+                        direction: DismissDirection.horizontal,
+                        onDismissed: (direction) => listOfCards.removeAt(index),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: CreationCard(model: listOfCards[index]),
+                        ),
                       );
                     },
                   ),

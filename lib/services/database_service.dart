@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/cardmodel.dart';
@@ -54,7 +56,7 @@ class DatabaseService {
           ${CardFields.listDeckID} INTEGER NOT NULL,
           ${CardFields.term} TEXT NOT NULL,
           ${CardFields.definition} TEXT NOT NULL,
-          FOREIGN KEY (${CardFields.listDeckID}) REFERENCES $decksTable (${DeckFields.deckID})
+          FOREIGN KEY (${CardFields.listDeckID}) REFERENCES $decksTable (${DeckFields.deckID}) ON DELETE CASCADE
         )
         ''');
 
@@ -87,7 +89,6 @@ class DatabaseService {
 
   Future<int> removeDeck(int deckId) async {
     final db = await instance.database;
-    await db.rawDelete('DELETE FROM $listTable WHERE ${CardFields.listDeckID} = ?', [deckId]);
     return db.rawDelete('DELETE FROM $decksTable WHERE ${DeckFields.deckID} = ?', [deckId]);
   }
 
@@ -171,6 +172,26 @@ class DatabaseService {
     return false;
   }
  }
+
+ static Future<void> deleteDatabaseFile(String dbName) async {
+  // Get the database path
+  final databasePath = await getDatabasesPath();
+  final dbPath = '$databasePath/$dbName';
+
+  // Check if the file exists
+  final dbFile = File(dbPath);
+  if (await dbFile.exists()) {
+    try {
+      // Delete the database file
+      await deleteDatabase(dbPath);
+      print("Database deleted: $dbPath");
+    } catch (e) {
+      print("Error deleting database: $e");
+    }
+  } else {
+    print("Database file does not exist: $dbPath");
+  }
+}
 
  //methods for displaying the top 10 times
 

@@ -3,8 +3,16 @@ import 'package:provider/provider.dart';
 import 'pages/homepage.dart';
 import 'package:revised_flashcard_application/services/deckprovider.dart';
 import 'package:revised_flashcard_application/services/timerprovider.dart';
+import 'package:revised_flashcard_application/services/database_service.dart';
 
-void main() {
+Future<void> main() async {
+  // Ensure Flutter bindings are initialized
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Perform the asynchronous database deletion
+  
+
+  // Start the app
   runApp(const MainApp());
 }
 

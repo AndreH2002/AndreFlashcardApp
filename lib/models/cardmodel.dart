@@ -7,12 +7,18 @@ class CardFields {
 }
 
 class CardModel {
+ 
   String? term;
   String? definition;
+  LearnStatus? learnStatus;
 
   CardModel({
     this.term,
-    this.definition
+    this.definition,
+    this.learnStatus,
   });
 }
 
+enum LearnStatus {
+  unlearned, learning, learned
+}

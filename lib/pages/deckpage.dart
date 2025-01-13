@@ -126,7 +126,7 @@ class _DeckPageState extends State<DeckPage> {
                   _buildNavigationOption(
                     label: 'Learn',
                     onTap: () {
-                      if(listOfCards.isNotEmpty) {
+                      if(listOfCards.isNotEmpty && listOfCards.length > 3) {
                          Navigator.push(
                         context,
                         MaterialPageRoute(
