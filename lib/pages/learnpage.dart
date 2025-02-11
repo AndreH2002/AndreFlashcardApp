@@ -47,12 +47,12 @@ void initState() {
 
     //get the first card in the list and get 3 incorrect terms to throw into the multiple choice
     currentCard = listOfCards.first;
-    currentWrongTerms = _getWrongTerms(currentCard.term!, currentCard.definition!);
+    currentWrongTerms = _getWrongTerms(currentCard.term, currentCard.definition);
 
     currentMultipleChoice = MultipleChoiceWidget(
       key:ValueKey(currentCard.term),
-      definition: currentCard.definition!,
-      correctTerm: currentCard.term!,
+      definition: currentCard.definition,
+      correctTerm: currentCard.term,
       wrongTerms: currentWrongTerms,
       isClickable: true,
       onCorrect: () {
@@ -110,7 +110,7 @@ void initState() {
       //creates a loop that gets the three random values
       while(n < 3 && totalList.isNotEmpty) {
         int randomIndex = Random().nextInt(totalList.length);
-        randomThree.add(totalList.elementAt(randomIndex).term!);
+        randomThree.add(totalList.elementAt(randomIndex).term);
         totalList.removeAt(randomIndex);
         n++;
       }
@@ -255,9 +255,9 @@ void initState() {
     }
 
     void _setToMultipleChoiceWidget() {
-       currentWrongTerms = _getWrongTerms(currentCard.term!, currentCard.definition!);
+       currentWrongTerms = _getWrongTerms(currentCard.term, currentCard.definition);
        currentMultipleChoice = MultipleChoiceWidget(key: ValueKey(currentCard.term),
-              definition: currentCard.definition!, correctTerm: currentCard.term!, wrongTerms: currentWrongTerms, isClickable: true,
+              definition: currentCard.definition, correctTerm: currentCard.term, wrongTerms: currentWrongTerms, isClickable: true,
                 onCorrect: () {
                   _onClicked(true);
                 },
@@ -270,7 +270,7 @@ void initState() {
     
     void _setToWritingWidget() {
       
-      currentWritingWidget = WritingWidget(key: ValueKey(currentCard.term), term: currentCard.term!, definition: currentCard.definition!, 
+      currentWritingWidget = WritingWidget(key: ValueKey(currentCard.term), term: currentCard.term, definition: currentCard.definition, 
               onCorrect: (){ 
 
                 _onWritten(true);

@@ -67,8 +67,8 @@ class _DeckPageState extends State<DeckPage> {
                     child: SizedBox(
                       width: 225,
                       child: Flashcard(
-                        frontText: listOfCards[index].term!,
-                        backText: listOfCards[index].definition!,
+                        frontText: listOfCards[index].term,
+                        backText: listOfCards[index].definition,
                       ),
                     ),
                   );
@@ -126,7 +126,7 @@ class _DeckPageState extends State<DeckPage> {
                   _buildNavigationOption(
                     label: 'Learn',
                     onTap: () {
-                      if(listOfCards.isNotEmpty && listOfCards.length > 3) {
+                      if(listOfCards.isNotEmpty && listOfCards.length > 4) {
                          Navigator.push(
                         context,
                         MaterialPageRoute(

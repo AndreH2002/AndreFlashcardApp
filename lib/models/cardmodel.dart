@@ -8,13 +8,13 @@ class CardFields {
 
 class CardModel {
  
-  String? term;
-  String? definition;
+  String term;
+  String definition;
   LearnStatus? learnStatus;
 
   CardModel({
-    this.term,
-    this.definition,
+    required this.term,
+    required this.definition,
     this.learnStatus,
   });
 }

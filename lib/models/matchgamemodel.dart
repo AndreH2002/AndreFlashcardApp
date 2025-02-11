@@ -33,8 +33,8 @@ class MatchGameModel {
     //if there are less than or equal to 6 cards in the list all the cards will be included in the game
     if (cardCopy.length <= 6) {
       for (int i = 0; i < cardsLeft; i++) {
-        MatchCard term = MatchCard(text: cardCopy[i].term!);
-        MatchCard definition = MatchCard(text: cardCopy[i].definition!);
+        MatchCard term = MatchCard(text: cardCopy[i].term);
+        MatchCard definition = MatchCard(text: cardCopy[i].definition);
 
         term.partner = definition;
         definition.partner = term;
@@ -48,8 +48,8 @@ class MatchGameModel {
       while (cardsLeft > 0) {
         int randomIndex = Random().nextInt(cardsLeft);
 
-        MatchCard term = MatchCard(text: cardCopy[randomIndex].term!);
-        MatchCard definition = MatchCard(text: cardCopy[randomIndex].definition!);
+        MatchCard term = MatchCard(text: cardCopy[randomIndex].term);
+        MatchCard definition = MatchCard(text: cardCopy[randomIndex].definition);
 
         term.partner = definition;
         definition.partner = term;

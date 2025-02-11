@@ -46,8 +46,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     currentCard = Flashcard(
-      frontText: listOfCards[currentCardIndex].term!,
-      backText: listOfCards[currentCardIndex].definition!,
+      frontText: listOfCards[currentCardIndex].term,
+      backText: listOfCards[currentCardIndex].definition,
     );
   }
 
@@ -181,8 +181,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
     needStudyingCount++;
     
     currentCard = Flashcard(
-      frontText: stillLearning[currentCardIndex].term!,
-      backText: stillLearning[currentCardIndex].definition!,
+      frontText: stillLearning[currentCardIndex].term,
+      backText: stillLearning[currentCardIndex].definition,
     );
   } else {
     needStudyingCount++;
@@ -197,8 +197,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
     masteredCount++;
     stillLearning.removeAt(currentCardIndex);
     currentCard = Flashcard(
-      frontText: stillLearning[currentCardIndex].term!,
-      backText: stillLearning[currentCardIndex].definition!,
+      frontText: stillLearning[currentCardIndex].term,
+      backText: stillLearning[currentCardIndex].definition,
     );
   } else {
     masteredCount++;
@@ -244,8 +244,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 roundFinished = false;
           
                 currentCard = Flashcard(
-                  frontText: stillLearning[currentCardIndex].term!,
-                 backText: stillLearning[currentCardIndex].definition!);
+                  frontText: stillLearning[currentCardIndex].term,
+                 backText: stillLearning[currentCardIndex].definition);
           
                 
               });
@@ -270,8 +270,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
               //reset the index and current card to the first in the list
               currentCardIndex = 0;
               currentCard = Flashcard(
-                frontText: stillLearning[currentCardIndex].term!,
-               backText: stillLearning[currentCardIndex].definition!);
+                frontText: stillLearning[currentCardIndex].term,
+               backText: stillLearning[currentCardIndex].definition);
               
               learning = true;
 
@@ -313,9 +313,18 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
   Widget chart(int mastered, int totalTerms) {
     double masteredPercentage = mastered / totalTerms;
-    return CustomPaint(
-      size: const Size(100, 100),
-      painter: CircularChartPainter(masteredPercentage: masteredPercentage),
+    String toText = '${(masteredPercentage * 100).toStringAsFixed(2)}%';
+
+    return Stack(
+      alignment: Alignment.center,
+        children: [
+        CustomPaint(
+          size: const Size(100, 100),
+          painter: CircularChartPainter(masteredPercentage: masteredPercentage),
+        ),
+
+        Text(toText, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+      ],
     );
   }
 }

@@ -150,7 +150,7 @@ class _CreatePageState extends State<CreatePage> {
 
               //add button
               ElevatedButton.icon(
-                onPressed: () => setState(() => listOfCards.add(CardModel())),
+                onPressed: () => setState(() => listOfCards.add(CardModel(term: "", definition: ""))),
                 icon: const Icon(Icons.add, size: 20),
                 label: const Text('Add Card'),
                 style: ElevatedButton.styleFrom(
@@ -185,6 +185,6 @@ class _CreatePageState extends State<CreatePage> {
 
   //we need a function to remove any cards that don't have any text in the term or definition
   void _checkForNullTerms(List<CardModel>listToCheck) {
-    listToCheck.removeWhere((element) => element.term == null || element.definition == null);
+    listToCheck.removeWhere((element) => element.term == "" || element.definition == "");
   }
 }
