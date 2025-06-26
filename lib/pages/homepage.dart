@@ -14,28 +14,49 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  String dataFetchAttempt = "";
 
+  late Future<DeckOperationStatus> _deckFetchFuture;
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    fetchAttempt();
+  void initState() {
+    
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      
+      setState(() {
+        _deckFetchFuture = context.read<DeckService>().getDeckList();
+      }); // trigger rebuild once future is ready
+  });
   }
 
-  Future<void> fetchAttempt() async {
-    dataFetchAttempt = await context.watch<DeckService>().getDeckList();
-    setState(() {});
+  //this attempts to get the deck list 
+  Future<bool> fetchAttempt() async {
+    DeckOperationStatus fetch = await context.read<DeckService>().getDeckList();
+    if (fetch == DeckOperationStatus.success) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
+  //this attempts to remove the deck
   Future<bool> awaitAttempt(int deckId) async {
-    String attempt = await context.read<DeckService>().removeDeck(deckId);
-    return attempt == "OK";
+    DeckOperationStatus removalAttempt = await context.read<DeckService>().removeDeck(deckId);
+
+    if(removalAttempt == DeckOperationStatus.success) {
+      return true;
+    } 
+    else {
+      return false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFf4f5fc),
+
+      //title area
       appBar: AppBar(
         backgroundColor: const Color(0xFF3b038a),
         title: const Text(
@@ -45,27 +66,49 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         elevation: 0,
       ),
+
+      //body 
       body: Column(
         children: [
+
+          //creation button and header 
           _buildCreateDeckButton(),
           const SizedBox(height: 10),
           _buildHeader(),
           const SizedBox(height: 10),
+
+          //this is where the actual decks are stored if any
           Expanded(
-            child: dataFetchAttempt == "OK"
-                ? _buildDeckList()
-                : const Center(
-                    child: Text(
-                      'No data available',
-                      style: TextStyle(color: Colors.black54, fontSize: 18),
-                    ),
-                  ),
+            child: FutureBuilder(
+            future: _deckFetchFuture,
+            builder: (context, snapshot) {
+            debugPrint('FutureBuilder: state=${snapshot.connectionState}, hasData=${snapshot.hasData}, data=${snapshot.data}, hasError=${snapshot.hasError}');
+          //loading symbol if decks aren't pulled up yet
+           if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+            //detected error
+           } else if (snapshot.hasError) {
+              return const Center(child: Text('Error loading data'));
+                //success
+              } else if (snapshot.data == DeckOperationStatus.success) {
+                final decks = context.watch<DeckService>().listOfDecks;
+                debugPrint('Decks in provider: ${context.read<DeckService>().listOfDecks.length}');
+                  return decks.isEmpty
+                    ? const Center(child: Text('No decks available'))
+                    : _buildDeckList();
+                    //some other sort of weird error
+                } else {
+                  return const Center(child: Text('Failed to load deck data'));
+              }
+            },
           ),
+        ),
         ],
       ),
     );
   }
 
+  //when pressed the create deck button redirects to new CreatePage widget
   Widget _buildCreateDeckButton() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
@@ -90,6 +133,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  //Retrieves all decks from the database
   Widget _buildDeckList() {
     return Consumer<DeckService>(
       builder: (context, deckService, child) {
@@ -146,6 +190,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+
+  //this handles the logic behind deleteing a deck which is used using the swipe feature
   Future<bool?> _showDeleteConfirmation(String deckName, int index, DeckService deckService) {
     return showDialog<bool>(
       context: context,
@@ -161,9 +207,9 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: () async {
                 final deckId = await DatabaseService.instance.getDeckId(deckName);
-                final success = await awaitAttempt(deckId);
-                if (success && context.mounted) {
-                  deckService.listOfDecks.removeAt(index);
+                if (await awaitAttempt(deckId) == true && context.mounted) {
+                  await deckService.getDeckList();
+                  if (mounted) setState(() {});
                   Navigator.of(context).pop(true);
                 } else {
                   if(context.mounted) {

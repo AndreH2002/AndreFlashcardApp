@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/deckmodel.dart';
 import 'database_service.dart';
 
+enum DeckOperationStatus { success, failure}
+
 class DeckService with ChangeNotifier {
   DeckModel? _selectedModel;
   List<DeckModel> _listOfDecks = [];
@@ -9,87 +11,83 @@ class DeckService with ChangeNotifier {
   List<DeckModel> get listOfDecks => _listOfDecks;
   DeckModel? get selectedModel => _selectedModel;
 
-Future<String> addDeck(DeckModel model) async {
-  try{
-    await DatabaseService.instance.addDeck(model);
-    notifyListeners();
+  Future<DeckOperationStatus> addDeck(DeckModel model) async {
+    try {
+      await DatabaseService.instance.addDeck(model);
+      _listOfDecks = await DatabaseService.instance.getDecks();
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e) {
+      debugPrint('Add deck error: $e');
+      return DeckOperationStatus.failure;
+    }
   }
-  catch(e) {
-    return e.toString();
-  }
-  return "OK";
-}
 
-Future<String> removeDeck(int deckID) async {
-  try {
-    await DatabaseService.instance.removeDeck(deckID);
-    notifyListeners();
+  Future<DeckOperationStatus> removeDeck(int deckID) async {
+    try {
+      await DatabaseService.instance.removeDeck(deckID);
+      _listOfDecks = await DatabaseService.instance.getDecks();
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e) {
+      debugPrint('Remove deck error: $e');
+      return DeckOperationStatus.failure;
+    }
   }
-  catch(e) {
-    return e.toString();
-  }
-  return "OK";
-}
 
-Future<String> getDeckID(String name, int? id) async {
-  try {
-    id = await DatabaseService.instance.getDeckId(name);
-    notifyListeners();
+  Future<int?> getDeckID(String name) async {
+    try {
+      return await DatabaseService.instance.getDeckId(name);
+    } catch (e) {
+      debugPrint('Get deck ID error: $e');
+      return null;
+    }
   }
-  catch(e) {
-    return e.toString();
-  }
-  return "OK";
-}
 
-Future<String> getDeckModelFromID(int id) async {
-  try {
-    _selectedModel = await DatabaseService.instance.getDeckModelFromID(id);
-    notifyListeners();
+  Future<DeckOperationStatus> getDeckModelFromID(int id) async {
+    try {
+      _selectedModel = await DatabaseService.instance.getDeckModelFromID(id);
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e) {
+      debugPrint('Get deck model from ID error: $e');
+      return DeckOperationStatus.failure;
+    }
   }
-  catch(e) {
-    return e.toString();
-  }
-  return "OK";
-}
 
-Future<String> getDeckModelFromName(String deckname) async {
-  try {
-    _selectedModel = await DatabaseService.instance.getDeckModelFromName(deckname);
+  Future<DeckOperationStatus> getDeckModelFromName(String deckname) async {
+    try {
+      _selectedModel = await DatabaseService.instance.getDeckModelFromName(deckname);
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e) {
+      debugPrint('Get deck model from name error: $e');
+      _selectedModel = null;
+      return DeckOperationStatus.failure;
+    }
   }
-  catch(e) {
-    _selectedModel = null;
-    return e.toString();
-  }
-  return "OK";
-}
 
-Future<String> getDeckList() async {
-  try {
-    _listOfDecks = await DatabaseService.instance.getDecks();
-   
-  }
-  catch(e) {
-    return e.toString();
-  }
-  finally {
-    notifyListeners();
-  }
-   
-  return "OK";
-}
+  Future<DeckOperationStatus> getDeckList() async {
+    debugPrint('DeckService: getDeckList called');
+    try {
+      _listOfDecks = await DatabaseService.instance.getDecks();
+      debugPrint('Fetched ${_listOfDecks.length} decks');
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e, stackTrace) {
+      debugPrint('getDeckList error: $e');
+       debugPrintStack(stackTrace: stackTrace);
 
-Future<bool> deckNameExists(String name) async {
-  bool exists = true;
-  try {
-    exists = await DatabaseService.instance.deckNameExists(name);
-    
-    notifyListeners();
+      return DeckOperationStatus.failure;
+    }
   }
-  catch(e) {
-    return true;
-  }
-  return exists;
-}
 
+  Future<bool?> deckNameExists(String name) async {
+    try {
+      return await DatabaseService.instance.deckNameExists(name);
+    } catch (e) {
+      debugPrint('deckNameExists error: $e');
+      return null;
+    }
+  }
 }

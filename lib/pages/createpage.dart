@@ -26,9 +26,16 @@ class _CreatePageState extends State<CreatePage> {
 
   //adds the deck through the try catch method definded in deckservice
   Future<bool> _addDeckAttempt(DeckModel model) async {
-    String attempt = await context.read<DeckService>().addDeck(model);
-    return attempt == "OK";
+    DeckOperationStatus result = await context.read<DeckService>().addDeck(model);
+    if (result == DeckOperationStatus.success) {
+      return true;
+    }
+    else {
+      return false;
+    }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +60,7 @@ class _CreatePageState extends State<CreatePage> {
               }
 
               //checks for duplicate title string
-              else if(await context.read<DeckService>().deckNameExists(titleString)) {
+              else if(await context.read<DeckService>().deckNameExists(titleString) == true)  {
                 if(context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar( 
                   const SnackBar(content: Text('Deck title already exists or failure to add deck')),
@@ -62,10 +69,9 @@ class _CreatePageState extends State<CreatePage> {
                 return;
               }
               else {
-
-
               //tries to add deck from database
               _checkForNullTerms(listOfCards);
+
               final modelToSubmit = DeckModel(
                 deckname: titleString,
                 listOfCards: listOfCards,
@@ -74,14 +80,19 @@ class _CreatePageState extends State<CreatePage> {
               if (await _addDeckAttempt(modelToSubmit) && context.mounted) {
                 Navigator.pop(context);
               } else {
-                if(mounted) {
+                  final success = await _addDeckAttempt(modelToSubmit);
+
+                if (!mounted) return;
+
+                if (success) {
+                  Navigator.pop(context);
+                } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Failed to add deck')),
-                );
+                  );
                 }
               }
               }
-             
             },
             child: const Text(
               'Done',

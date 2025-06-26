@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/cardmodel.dart';
@@ -25,19 +28,27 @@ class DatabaseService {
   }
 
   Future<Database> getDatabase() async {
-    final databaseDirPath = await getDatabasesPath();
-    final databasePath = join(databaseDirPath, "master_db.db");
-    final database = await openDatabase(
-      databasePath,
-      version: 1,
-      onCreate: (db, version) {
-        _onCreate(db, version);
-      },
-      onConfigure: _onConfigure,
-    );
-    return database;
-  }
+  final databaseDirPath = await getDatabasesPath();
+  final databasePath = join(databaseDirPath, "master_db.db");
 
+  final dbFile = File(databasePath);
+  final exists = await dbFile.exists();
+
+  debugPrint('💾 DB path: $databasePath');
+  debugPrint('✅ DB file exists before opening? $exists');
+
+  final database = await openDatabase(
+    databasePath,
+    version: 1,
+    onConfigure: _onConfigure,
+    onCreate: (db, version) async {
+      debugPrint('🛠️ Running _onCreate: creating tables...');
+      await _onCreate(db, version);
+    },
+  );
+
+  return database;
+}
 
   Future _onCreate(Database db, int version) async {
     db.execute('''
@@ -63,16 +74,12 @@ class DatabaseService {
 
   Future _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
-    await db.execute('PRAGMA journal_mode = WAL');
+    await db.rawQuery('PRAGMA journal_mode = WAL');
   }
 
   Future close() async {
     final db = await instance.database;
     db.close();
-  }
-
-  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
-    
   }
 
   Future<bool> columnExists(Database db, String table, String column) async {
@@ -101,11 +108,13 @@ class DatabaseService {
     
   }
 
-  Future<int> removeDeck(int deckId) async {
+  Future<void> removeDeck(int deckId) async {
     final db = await instance.database;
     
-    await db.rawDelete('DELETE FROM $listTable WHERE ${CardFields.listDeckID} = ?', [deckId]);
-    return db.rawDelete('DELETE FROM $decksTable WHERE ${DeckFields.deckID} = ?', [deckId]);
+    await db.transaction((txn) async {
+      await txn.rawDelete('DELETE FROM $listTable WHERE ${CardFields.listDeckID} = ?', [deckId]);
+      await txn.rawDelete('DELETE FROM $decksTable WHERE ${DeckFields.deckID} = ?', [deckId]);
+    });
   }
 
   Future<int>getDeckId(String name) async {
@@ -122,8 +131,10 @@ class DatabaseService {
   }
 
   Future<List<DeckModel>> getDecks() async {
+    debugPrint('DatabaseService.getDecks called');
     final db = await instance.database;
 
+    debugPrint('Fetching decks from DB...');
     //perform a join to get both tables mapped
     final decksData = await db.rawQuery(
       '''
@@ -162,7 +173,9 @@ class DatabaseService {
       }
       }
       List<DeckModel> decks = decksMap.values.toList();
+      debugPrint('Decks fetched: ${decksData.length}');
       return decks;
+      
   }
 
   Future<DeckModel> getDeckModelFromID(int id) async {
