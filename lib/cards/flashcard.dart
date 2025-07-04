@@ -3,10 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class Flashcard extends StatefulWidget {
-  const Flashcard({super.key, required this.frontText, required this.backText});
+  const Flashcard({super.key, required this.frontText, required this.backText, this.frontImagePath, this.backImagePath});
 
   final String frontText;
   final String backText;
+  final String? frontImagePath;
+  final String? backImagePath;
 
   @override
   State<Flashcard> createState() => _FlashcardState();
@@ -64,13 +66,24 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
   Widget _buildTransform(bool isFront){
     String frontText;
     String backText;
+    // ignore: unused_local_variable
+    String? frontImagePath;
+    // ignore: unused_local_variable
+    String? backImagePath;
+
     if(isFront) {
       frontText = widget.frontText;
       backText = widget.backText;
+      frontImagePath = widget.frontImagePath;
+      backImagePath = widget.backImagePath;
+     
+      
     }
     else {
       frontText = widget.backText;
       backText = widget.frontText;
+      frontImagePath = widget.backImagePath;
+      backImagePath = widget.frontImagePath;
     }
     return Transform(  
         alignment: Alignment.center,
@@ -80,18 +93,19 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
               child: _flipAnimation.value <= pi / 2
                   ? _buildCard(
                     frontText,
+                    frontImagePath
                     )
                   : Transform(
                      alignment: Alignment.center,
                       transform: Matrix4.identity()..rotateY(pi),
-                      child: _buildCard(backText),
+                      child: _buildCard(backText, backImagePath),
                     ),
     );
   }
 
 
   //creates the card within the transformation
-  Widget _buildCard(String text) {
+  Widget _buildCard(String text, String? imagePath) {
     return Container(
       decoration: BoxDecoration( 
         gradient: const LinearGradient(

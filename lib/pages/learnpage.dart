@@ -30,6 +30,7 @@ class _LearnPageState extends State<LearnPage> {
   bool inGame = true;
   bool isMultipleChoice = true;
   bool done = false;
+  bool solveForTerm = true;
 
   @override
 void initState() {
@@ -55,6 +56,8 @@ void initState() {
       correctTerm: currentCard.term,
       wrongTerms: currentWrongTerms,
       isClickable: true,
+      solveForTerm: solveForTerm,
+      model: currentCard,
       onCorrect: () {
        _onClicked(true);
       },
@@ -258,6 +261,7 @@ void initState() {
        currentWrongTerms = _getWrongTerms(currentCard.term, currentCard.definition);
        currentMultipleChoice = MultipleChoiceWidget(key: ValueKey(currentCard.term),
               definition: currentCard.definition, correctTerm: currentCard.term, wrongTerms: currentWrongTerms, isClickable: true,
+              solveForTerm: solveForTerm, model: currentCard,
                 onCorrect: () {
                   _onClicked(true);
                 },
@@ -270,11 +274,8 @@ void initState() {
     
     void _setToWritingWidget() {
       
-      currentWritingWidget = WritingWidget(key: ValueKey(currentCard.term), term: currentCard.term, definition: currentCard.definition, 
-              onCorrect: (){ 
-
-                _onWritten(true);
-              },
+      currentWritingWidget = WritingWidget(key: ValueKey(currentCard.term), model: currentCard, solveForTerm: solveForTerm,
+              onCorrect: (){ _onWritten(true); },
               onWrong: () {_onWritten(false);
               }) ;
       isMultipleChoice = false;

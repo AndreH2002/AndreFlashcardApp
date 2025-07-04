@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:revised_flashcard_application/models/cardmodel.dart';
 
 class WritingWidget extends StatefulWidget {
-  const WritingWidget({super.key, required this.term, required this.definition, 
-  required this.onCorrect, required this.onWrong});
+  const WritingWidget({super.key, required this.model, required this.solveForTerm, required this.onCorrect, required this.onWrong});
 
-  final String definition;
-  final String term;
+  final CardModel model;
+  final bool solveForTerm;
   final VoidCallback onCorrect;
   final VoidCallback onWrong;
 
@@ -20,7 +22,9 @@ enum Status{
 class _WritingWidgetState extends State<WritingWidget> {
   late String term;
   late String definition;
-  
+  String? termImagePath;
+  String? defImagePath;
+
   Status status = Status.typing;
 
   final _controller = TextEditingController();
@@ -28,8 +32,10 @@ class _WritingWidgetState extends State<WritingWidget> {
   @override
   void initState() {
     super.initState();
-    term = widget.term;
-    definition = widget.definition;
+    term = widget.model.term;
+    definition = widget.model.definition;
+    termImagePath = widget.model.termImagePath;
+    defImagePath = widget.model.defImagePath;
   }
 
   @override
@@ -42,7 +48,17 @@ class _WritingWidgetState extends State<WritingWidget> {
     return Column( 
       children: [ 
         Flexible(flex: 1, child: Container()),
-        Flexible(flex: 1, child: Text(definition, textScaler: TextScaler.linear(2.0),)),
+        Expanded(
+          flex: 1,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(definition, textScaler: TextScaler.linear(2.0),),
+              SizedBox(height:10),
+              imageDisplay(),
+            ],
+          ),
+        ),
        
         Flexible(flex: 1, 
         child: _displayedWidget()
@@ -103,6 +119,25 @@ class _WritingWidgetState extends State<WritingWidget> {
         Text('Incorrect!', style: TextStyle(color: Colors.redAccent),),
         Icon(Icons.cancel, color: Colors.redAccent),
       ],
+    );
+  }
+
+  Widget imageDisplay() {
+    String? imagePath = widget.solveForTerm
+    ? widget.model.defImagePath
+    : widget.model.termImagePath;
+
+    if(imagePath == null) {
+      return const SizedBox.shrink();
+    }
+    return ClipRRect(  
+      borderRadius: BorderRadius.circular(8),
+      child: Image.file(File(
+        imagePath,
+      ),
+      height: 150,
+      width: 150,
+      ),
     );
   }
 }

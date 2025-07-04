@@ -39,12 +39,13 @@ class DatabaseService {
 
   final database = await openDatabase(
     databasePath,
-    version: 1,
+    version: 2,
     onConfigure: _onConfigure,
     onCreate: (db, version) async {
       debugPrint('🛠️ Running _onCreate: creating tables...');
       await _onCreate(db, version);
     },
+    onUpgrade: _onUpgrade,
   );
 
   return database;
@@ -65,6 +66,8 @@ class DatabaseService {
           ${CardFields.listDeckID} INTEGER NOT NULL,
           ${CardFields.term} TEXT NOT NULL,
           ${CardFields.definition} TEXT NOT NULL,
+          ${CardFields.termImagePath} TEXT,
+          ${CardFields.defImagePath} TEXT,
           FOREIGN KEY (${CardFields.listDeckID}) REFERENCES $decksTable (${DeckFields.deckID}) ON DELETE CASCADE
         )
         ''');
@@ -77,6 +80,17 @@ class DatabaseService {
     await db.rawQuery('PRAGMA journal_mode = WAL');
   }
 
+  Future _onUpgrade(Database db, oldVersion, newVersion) async{
+    if(oldVersion < 2) {
+      await db.execute('''ALTER TABLE $listTable 
+      ADD COLUMN ${CardFields.termImagePath} TEXT
+      ''');
+
+      await db.execute('''ALTER TABLE $listTable
+      ADD COLUMN ${CardFields.defImagePath} TEXT
+      ''');
+    }
+  }
   Future close() async {
     final db = await instance.database;
     db.close();
@@ -89,23 +103,33 @@ class DatabaseService {
   return result.any((row) => row['name'] == column);
 }
 
-  Future<void> addDeck(DeckModel deck) async {
+  Future<DeckModel> addDeck(DeckModel deck) async {
     
     final db = await instance.database;
 
-      final deckId = await db.rawInsert(
+    //first part inserts the name and the number of cards into the table and returns the id
+    int? deckID;
+    deckID = await db.rawInsert(
       '''INSERT INTO $decksTable(${DeckFields.deckname}, ${DeckFields.numOfCards}) VALUES(?, ?)''', 
       [deck.deckname, deck.numOfCards]
     );
 
+    /*
+      this part loops through every card in the deck and puts it in the list of all the total cards linking it with it
+      its deck through the listDeckID which ids which deck it comes from
+    */
     for(final card in deck.listOfCards) {
-      await db.rawInsert( 
+      final listId = await db.rawInsert( 
         '''INSERT INTO $listTable(${CardFields.listDeckID}, ${CardFields.term}, ${CardFields.definition}) VALUES(?, ?, ?)''',
-        [deckId, card.term, card.definition],
+        [deckID, card.term, card.definition],
       );
+      card.listID = listId;
     }
     
-    
+    DeckModel addedModel = DeckModel(deckID: deckID, deckname: deck.deckname, 
+        listOfCards: deck.listOfCards, numOfCards: deck.numOfCards);
+
+      return addedModel;
   }
 
   Future<void> removeDeck(int deckId) async {
@@ -135,7 +159,7 @@ class DatabaseService {
     final db = await instance.database;
 
     debugPrint('Fetching decks from DB...');
-    //perform a join to get both tables mapped
+    //performs a join to get both tables mapped
     final decksData = await db.rawQuery(
       '''
       SELECT *
@@ -151,16 +175,17 @@ class DatabaseService {
     for(final row in decksData) {
       final deckID = row[DeckFields.deckID] as int;
 
-      //if the id is already added to the map then we add the cards to the list
+      //if the id is already added to the map then the cards are added  to the list
       if(decksMap.containsKey(deckID)) {
         decksMap[deckID]!.listOfCards.add(
           CardModel(term: row[CardFields.term] as String,  
           definition: row[CardFields.definition] as String,
         )); 
       }
-      //otherwise we create a new row in the map
+      //creates a new row in the map if not added
       else {
         decksMap[deckID] = DeckModel(  
+          deckID: deckID,
           deckname: row[DeckFields.deckname] as String,
           numOfCards: row[DeckFields.numOfCards] as int,
           listOfCards: [
@@ -242,6 +267,46 @@ class DatabaseService {
   }
  }
 
+Future<void> updateDeck(DeckModel updatedDeck) async{ 
+  final db = await instance.database;
+
+    if (updatedDeck.deckID == null) {
+        debugPrint("❌ ERROR: Deck ID is null before inserting cards!");
+        throw Exception("Deck ID is null during update");
+      }
+
+    await db.transaction((txn) async {
+      // Update deck name and numOfCards
+      await txn.update(
+        decksTable,
+        {
+          DeckFields.deckname: updatedDeck.deckname,
+          DeckFields.numOfCards: updatedDeck.listOfCards.length,
+        },
+        where: '${DeckFields.deckID} = ?',
+        whereArgs: [updatedDeck.deckID],
+      );
+
+      
+      // Delete old cards
+      await txn.delete(
+        listTable,
+        where: '${CardFields.listDeckID} = ?',
+        whereArgs: [updatedDeck.deckID],
+      );
+
+      // Insert new cards
+      for (final card in updatedDeck.listOfCards) {
+        await txn.insert(listTable, {
+          CardFields.listDeckID: updatedDeck.deckID,
+          CardFields.term: card.term,
+          CardFields.definition: card.definition,
+          CardFields.termImagePath: card.termImagePath,
+          CardFields.defImagePath: card.defImagePath,
+        });
+      }
+    });
+}
 
  //methods for displaying the top 10 times
 

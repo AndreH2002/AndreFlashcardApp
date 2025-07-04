@@ -11,15 +11,17 @@ class DeckService with ChangeNotifier {
   List<DeckModel> get listOfDecks => _listOfDecks;
   DeckModel? get selectedModel => _selectedModel;
 
-  Future<DeckOperationStatus> addDeck(DeckModel model) async {
+  Future<(DeckOperationStatus, DeckModel?)> addDeck(DeckModel model) async {
     try {
-      await DatabaseService.instance.addDeck(model);
+      DeckModel? updatedModel;
+      updatedModel = await DatabaseService.instance.addDeck(model);
       _listOfDecks = await DatabaseService.instance.getDecks();
       notifyListeners();
-      return DeckOperationStatus.success;
+      debugPrint('${updatedModel.deckID}this is the ID number');
+      return (DeckOperationStatus.success, updatedModel);
     } catch (e) {
       debugPrint('Add deck error: $e');
-      return DeckOperationStatus.failure;
+      return (DeckOperationStatus.failure, null);
     }
   }
 
@@ -88,6 +90,18 @@ class DeckService with ChangeNotifier {
     } catch (e) {
       debugPrint('deckNameExists error: $e');
       return null;
+    }
+  }
+
+  Future<DeckOperationStatus> updateDeck(DeckModel deckToUpdate) async{
+    try{
+      await DatabaseService.instance.updateDeck(deckToUpdate);
+      _listOfDecks = await DatabaseService.instance.getDecks();
+      notifyListeners();
+      return DeckOperationStatus.success;
+    } catch (e) {
+      debugPrint('Add deck error: $e');
+      return DeckOperationStatus.failure;
     }
   }
 }

@@ -1,11 +1,16 @@
 // ignore_for_file: must_be_immutable
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:revised_flashcard_application/models/cardmodel.dart';
 
 class MultipleChoiceWidget extends StatefulWidget {
   final String definition;
   final String correctTerm;
   final List<String> wrongTerms;
+  final CardModel model;
+  final bool solveForTerm;
 
   final VoidCallback? onCorrect;
   final VoidCallback? onWrong;
@@ -19,6 +24,8 @@ class MultipleChoiceWidget extends StatefulWidget {
     required this.correctTerm,
     required this.wrongTerms,
     required this.isClickable,
+    required this.model,
+    required this.solveForTerm,
     this.onCorrect,
     this.onWrong,
     this.roundFinished,
@@ -91,10 +98,17 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
                 child: ConstrainedBox(
                   constraints: BoxConstraints(minHeight: height, minWidth: width),
                   child: Center(
-                    child: Text(
-                      definition,
-                      textScaler: TextScaler.linear(2.0),
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          definition,
+                          textScaler: TextScaler.linear(2.0),
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        SizedBox(height: 10,),
+                        imageDisplay(),
+                      ],
                     ),
                   ),
                 ),
@@ -153,6 +167,25 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget imageDisplay() {
+    String? imagePath = widget.solveForTerm
+    ? widget.model.defImagePath
+    : widget.model.termImagePath;
+
+    if(imagePath == null) {
+      return const SizedBox.shrink();
+    }
+    return ClipRRect(  
+      borderRadius: BorderRadius.circular(8),
+      child: Image.file(File(
+        imagePath,
+      ),
+      height: 150,
+      width: 150,
       ),
     );
   }

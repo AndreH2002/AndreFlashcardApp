@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import '../models/cardmodel.dart';
+import 'package:image_picker/image_picker.dart';
 
 class CreationCard extends StatefulWidget {
   const CreationCard({super.key, required this.model});
@@ -43,17 +46,134 @@ class _CreationCardState extends State<CreationCard> {
     return Column(
       children: [
         //Term
-        TextField(
-          decoration: const InputDecoration(label: Text('Term')),
-          controller: termController,
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(label: Text('Term')),
+                controller: termController,
+              ),
+            ),
+            widget.model.termImagePath == null
+            ?ElevatedButton.icon(onPressed:() => _pickImage(true), label:const Text('Add image') )
+            : imageWidget(true),
+          ],
+          
         ),
 
         //Definition
-        TextField(
-          decoration: const InputDecoration(label: Text('Definition')),
-          controller: defController,
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                decoration: const InputDecoration(label: Text('Definition')),
+                controller: defController,
+              ),
+            ),
+            widget.model.defImagePath == null
+            ?ElevatedButton.icon(onPressed:() => _pickImage(false), label:const Text('Add image') )
+            :imageWidget(false)
+          ],
         ),
       ],
     );
   }
+  
+  //pulls up a view where you can select camera or gallery
+  Future<void> _pickImage(bool isTerm) async {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext ctx) {
+      return SafeArea(
+        child: Wrap(
+          children: <Widget>[
+            ListTile(
+              leading: const Icon(Icons.camera_alt),
+              title: const Text('Take a photo'),
+              onTap: () async {
+                Navigator.of(ctx).pop();
+                await _getImage(ImageSource.camera, isTerm);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo),
+              title: const Text('Choose from gallery'),
+              onTap: () async {
+                Navigator.of(ctx).pop();
+                await _getImage(ImageSource.gallery, isTerm);
+              },
+            ),
+          ],
+        ),
+      );
+    },
+  );
 }
+
+  //to put in the get image from gallery 
+  Future<void> _getImage(ImageSource source, bool isTerm) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        isTerm
+        ?widget.model.termImagePath = pickedFile.path
+        :widget.model.defImagePath = pickedFile.path;
+      });
+    }
+  }
+
+  Future<void> _removeImage(bool isTerm) async{
+    setState(() {
+      if(isTerm == true) {
+        widget.model.termImagePath = null;
+      }
+      else {
+        widget.model.defImagePath = null;
+      }
+    });
+  }
+
+  Widget imageWidget(bool isTerm){ 
+    return ClipRRect(  
+      borderRadius: BorderRadius.circular(8),
+                child: GestureDetector(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                      title: const Text("Remove Image"),
+                      content: const Text("Do you want to remove this image?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text("Cancel"),
+                        ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _removeImage(isTerm);
+                      },
+                      child: const Text("Remove"),
+                    ),
+                  ],
+                  ),
+                  );
+                  },
+                  child: Image.file(
+                    File(
+                      isTerm
+                      ?widget.model.termImagePath!
+                      :widget.model.defImagePath!
+                    ), 
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                          ),
+                ),
+    );
+  }
+}
+
+

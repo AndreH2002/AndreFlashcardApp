@@ -7,27 +7,33 @@ import '../services/deckprovider.dart';
 
 
 class CreatePage extends StatefulWidget {
-  const CreatePage({super.key, required this.listOfCards});
-  final List<CardModel> listOfCards;
-
+ const CreatePage({super.key, required this.deckModel, required this.isAlreadyCreated});
+  final DeckModel deckModel;
+  final bool isAlreadyCreated;
   @override
   State<CreatePage> createState() => _CreatePageState();
 }
 
 class _CreatePageState extends State<CreatePage> {
-  String titleString = "New Deck";
+  late String titleString;
   late List<CardModel> listOfCards;
-
+  late DeckModel model;
   @override
   void initState() {
     super.initState();
-    listOfCards = List.from(widget.listOfCards);
+    titleString = widget.deckModel.deckname;
+    listOfCards = widget.deckModel.listOfCards;
+    model = widget.deckModel;
   }
 
   //adds the deck through the try catch method definded in deckservice
-  Future<bool> _addDeckAttempt(DeckModel model) async {
-    DeckOperationStatus result = await context.read<DeckService>().addDeck(model);
-    if (result == DeckOperationStatus.success) {
+  Future<bool> _addDeckAttempt() async {
+    final (status, result) = await context.read<DeckService>().addDeck(model);
+    if (status == DeckOperationStatus.success && result != null) {
+      debugPrint(result.deckID.toString());
+      setState(() {
+      model = result;
+      });
       return true;
     }
     else {
@@ -35,7 +41,15 @@ class _CreatePageState extends State<CreatePage> {
     }
   }
 
-
+  Future<bool> _updateDeckAttempt() async {
+    DeckOperationStatus result = await context.read<DeckService>().updateDeck(model);
+    if(result == DeckOperationStatus.success) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,51 +64,79 @@ class _CreatePageState extends State<CreatePage> {
         actions: [
           TextButton(
             onPressed: () async {
+            // 1. Check for empty title or empty card list
+          if (titleString.isEmpty || listOfCards.isEmpty) {
+          if (!context.mounted) return;
+            ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Deck title or cards cannot be empty')),
+          );
+          return;
+          }
 
-              //checks for empty title or list
-              if (titleString.isEmpty || listOfCards.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Deck title or cards cannot be empty')),
-                );
-                return;
-              }
+        // 2. Check for duplicate title
+        final exists = await context.read<DeckService>().deckNameExists(titleString);
+    if (exists == true && titleString != widget.deckModel.deckname) {
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Deck title already exists')),
+    );
+    return;
+  }
 
-              //checks for duplicate title string
-              else if(await context.read<DeckService>().deckNameExists(titleString) == true)  {
-                if(context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar( 
-                  const SnackBar(content: Text('Deck title already exists or failure to add deck')),
-                );
-                }
-                return;
-              }
-              else {
-              //tries to add deck from database
-              _checkForNullTerms(listOfCards);
+  // 3. Clean up card list (remove null terms etc.)
+  _checkForNullTerms(listOfCards);
 
-              final modelToSubmit = DeckModel(
-                deckname: titleString,
-                listOfCards: listOfCards,
-                numOfCards: listOfCards.length,
-              );
-              if (await _addDeckAttempt(modelToSubmit) && context.mounted) {
-                Navigator.pop(context);
-              } else {
-                  final success = await _addDeckAttempt(modelToSubmit);
+  //4. update DeckModel with the title and num of cards
+  model.deckname = titleString;
+  model.listOfCards = listOfCards;
+  model.numOfCards = listOfCards.length;
 
-                if (!mounted) return;
+  // 5. Attempt to add deck 
 
-                if (success) {
-                  Navigator.pop(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Failed to add deck')),
-                  );
-                }
-              }
-              }
-            },
-            child: const Text(
+  if(widget.isAlreadyCreated) {
+    final success = await _updateDeckAttempt();
+      if(!context.mounted) return;
+
+      if(success) {
+        if(context.mounted) {
+          Navigator.pop(context);
+        }
+        
+      }
+      else {
+        if(context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(  
+          const SnackBar(content: Text('Failed to update deck')),
+        );
+        }
+        
+      }
+  }
+  else{
+    final success = await _addDeckAttempt();
+    debugPrint('After adding deck, model.deckID = ${model.deckID}');
+      if (!context.mounted) return;
+
+      if (success) {
+        if(context.mounted) {
+          Navigator.pop(context);
+        }
+      }
+      else {
+        if(context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to add deck')));
+        }
+       
+      }
+      
+    }
+    
+  },
+          
+    
+          
+      child: const Text(
               'Done',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),

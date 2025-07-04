@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:revised_flashcard_application/pages/createpage.dart';
 import '../cards/flashcard.dart';
 import '../models/cardmodel.dart';
 import '../models/deckmodel.dart';
@@ -83,13 +84,20 @@ class _DeckPageState extends State<DeckPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               children: [
-                Text(
-                  deckModel.deckname,
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      deckModel.deckname,
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
+                    ),
+
+                    IconButton(onPressed: _goToCreatePage, icon: Icon(Icons.edit)),
+                  ],
                 ),
                 Text(
                   '${listOfCards.length} Terms',
@@ -201,5 +209,15 @@ class _DeckPageState extends State<DeckPage> {
         ),
       ),
     );
+  }
+
+
+  void _goToCreatePage() {
+    Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => CreatePage(deckModel: widget.deckModel, isAlreadyCreated: true,),
+            ),
+          );
   }
 }

@@ -15,7 +15,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
-  late Future<DeckOperationStatus> _deckFetchFuture;
+  Future<DeckOperationStatus>? _deckFetchFuture;
   @override
   void initState() {
     
@@ -79,7 +79,10 @@ class _HomePageState extends State<HomePage> {
 
           //this is where the actual decks are stored if any
           Expanded(
-            child: FutureBuilder(
+            child: 
+            _deckFetchFuture == null
+            ? const Center(child: CircularProgressIndicator())
+            :FutureBuilder<DeckOperationStatus>(
             future: _deckFetchFuture,
             builder: (context, snapshot) {
             debugPrint('FutureBuilder: state=${snapshot.connectionState}, hasData=${snapshot.hasData}, data=${snapshot.data}, hasError=${snapshot.hasError}');
@@ -117,7 +120,8 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => const CreatePage(listOfCards: []),
+              builder: (context) => CreatePage(deckModel: DeckModel(deckname: "New Deck", listOfCards: [], numOfCards: 0), 
+                                      isAlreadyCreated: false,),
             ),
           );
         },
@@ -205,26 +209,28 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () async {
-                final deckId = await DatabaseService.instance.getDeckId(deckName);
-                if (await awaitAttempt(deckId) == true && context.mounted) {
-                  await deckService.getDeckList();
-                  if (mounted) setState(() {});
-                  Navigator.of(context).pop(true);
-                } else {
-                  if(context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Failed to delete deck')),
-                  );
-                  }
-                  if(context.mounted) {
-                    Navigator.of(context).pop(false);
-                  }
-                  
-                }
-              },
-              child: const Text('Delete'),
-            ),
+  onPressed: () {
+    DatabaseService.instance.getDeckId(deckName).then((deckId) {
+      awaitAttempt(deckId).then((success) {
+        if (!context.mounted) return;
+
+        if (success) {
+          deckService.getDeckList().then((_) {
+            if (!context.mounted) return;
+            setState(() {});
+            Navigator.of(context).pop(true);
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Failed to delete deck')),
+          );
+          Navigator.of(context).pop(false);
+        }
+      });
+    });
+  },
+  child: const Text('Delete'),
+),
           ],
         );
       },
