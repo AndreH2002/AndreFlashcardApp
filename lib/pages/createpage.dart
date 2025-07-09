@@ -18,22 +18,27 @@ class _CreatePageState extends State<CreatePage> {
   late String titleString;
   late List<CardModel> listOfCards;
   late DeckModel model;
+
+  late TextEditingController _titleController;
   @override
   void initState() {
     super.initState();
     titleString = widget.deckModel.deckname;
     listOfCards = widget.deckModel.listOfCards;
     model = widget.deckModel;
+    _titleController = TextEditingController(text: widget.deckModel.deckname);
   }
 
+  @override
+  void dispose(){
+  _titleController.dispose();
+  super.dispose();
+  }
   //adds the deck through the try catch method definded in deckservice
   Future<bool> _addDeckAttempt() async {
-    final (status, result) = await context.read<DeckService>().addDeck(model);
-    if (status == DeckOperationStatus.success && result != null) {
-      debugPrint(result.deckID.toString());
-      setState(() {
-      model = result;
-      });
+    final (status) = await context.read<DeckService>().addDeck(model);
+    if (status == DeckOperationStatus.success) {
+      debugPrint(model.deckID.toString());
       return true;
     }
     else {
@@ -157,9 +162,9 @@ class _CreatePageState extends State<CreatePage> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
               ),
-              onChanged: (value) => setState(() => titleString = value),
+              controller: _titleController,
+              onChanged: (value) => titleString = value),
             ),
-          ),
 
           //builder of all the different creation cards
 

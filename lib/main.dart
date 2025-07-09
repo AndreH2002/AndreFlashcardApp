@@ -4,13 +4,26 @@ import 'pages/homepage.dart';
 import 'package:revised_flashcard_application/services/deckprovider.dart';
 import 'package:revised_flashcard_application/services/timerprovider.dart';
 
+import 'services/database_service.dart';
+
 void main(){
   runApp(const MainApp());
 }
 
-class MainApp extends StatelessWidget {
+class MainApp extends StatefulWidget {
   const MainApp({super.key});
 
+  @override
+  State<MainApp> createState() => _MainAppState();
+}
+
+class _MainAppState extends State<MainApp> {
+
+  @override
+  void dispose() {
+    super.dispose();
+    DatabaseService.instance.close();
+  }
   @override
   Widget build(BuildContext context) {
       return MultiProvider(

@@ -67,7 +67,7 @@ void initState() {
     );
   } else {
     // Handle empty card list case
-    print("Deck is empty.");
+    debugPrint("Deck is empty.");
   }
 }
 

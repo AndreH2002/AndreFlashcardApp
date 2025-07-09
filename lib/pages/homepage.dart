@@ -124,6 +124,11 @@ class _HomePageState extends State<HomePage> {
                                       isAlreadyCreated: false,),
             ),
           );
+          if (mounted) {
+          setState(() {
+         _deckFetchFuture = context.read<DeckService>().getDeckList();
+        });
+  }
         },
         icon: const Icon(Icons.add),
         label: const Text('Create New Deck'),

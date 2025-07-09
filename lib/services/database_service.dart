@@ -39,7 +39,7 @@ class DatabaseService {
 
   final database = await openDatabase(
     databasePath,
-    version: 2,
+    version: 4,
     onConfigure: _onConfigure,
     onCreate: (db, version) async {
       debugPrint('🛠️ Running _onCreate: creating tables...');
@@ -81,14 +81,11 @@ class DatabaseService {
   }
 
   Future _onUpgrade(Database db, oldVersion, newVersion) async{
-    if(oldVersion < 2) {
-      await db.execute('''ALTER TABLE $listTable 
-      ADD COLUMN ${CardFields.termImagePath} TEXT
-      ''');
-
-      await db.execute('''ALTER TABLE $listTable
-      ADD COLUMN ${CardFields.defImagePath} TEXT
-      ''');
+    if(oldVersion < 4) {
+      await db.transaction((txn) async {
+        await txn.delete(listTable);
+        await txn.delete(decksTable);
+      });
     }
   }
   Future close() async {
@@ -96,6 +93,8 @@ class DatabaseService {
     db.close();
   }
 
+
+  //used to check for a duplicate name on a deck
   Future<bool> columnExists(Database db, String table, String column) async {
   final result = await db.rawQuery(
     "PRAGMA table_info($table)"
@@ -107,29 +106,28 @@ class DatabaseService {
     
     final db = await instance.database;
 
-    //first part inserts the name and the number of cards into the table and returns the id
-    int? deckID;
-    deckID = await db.rawInsert(
-      '''INSERT INTO $decksTable(${DeckFields.deckname}, ${DeckFields.numOfCards}) VALUES(?, ?)''', 
-      [deck.deckname, deck.numOfCards]
-    );
+    late int deckID;
+    await db.transaction((txn) async{
+      //first part inserts the name and the number of cards into the table and returns the id
 
-    /*
-      this part loops through every card in the deck and puts it in the list of all the total cards linking it with it
-      its deck through the listDeckID which ids which deck it comes from
-    */
-    for(final card in deck.listOfCards) {
-      final listId = await db.rawInsert( 
-        '''INSERT INTO $listTable(${CardFields.listDeckID}, ${CardFields.term}, ${CardFields.definition}) VALUES(?, ?, ?)''',
-        [deckID, card.term, card.definition],
+      deckID = await txn.rawInsert(
+        '''INSERT INTO $decksTable(${DeckFields.deckname}, ${DeckFields.numOfCards}) VALUES(?, ?)''', 
+        [deck.deckname, deck.numOfCards]
       );
-      card.listID = listId;
-    }
-    
-    DeckModel addedModel = DeckModel(deckID: deckID, deckname: deck.deckname, 
-        listOfCards: deck.listOfCards, numOfCards: deck.numOfCards);
 
-      return addedModel;
+      /*
+        this part loops through every card in the deck and puts it in the list of all the total cards linking it with it
+        its deck through the listDeckID which ids which deck it comes from
+      */
+      for(final card in deck.listOfCards) {
+        final listId = await txn.rawInsert( 
+         '''INSERT INTO $listTable(${CardFields.listDeckID}, ${CardFields.term}, ${CardFields.definition}, ${CardFields.termImagePath}, ${CardFields.defImagePath}) VALUES(?, ?, ?, ?, ?)''',
+          [deckID, card.term, card.definition, card.termImagePath, card.defImagePath]
+        );
+        card.listID = listId;
+      }
+      });
+      return deck.copy(deckID: deckID);
   }
 
   Future<void> removeDeck(int deckId) async {

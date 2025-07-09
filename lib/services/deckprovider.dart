@@ -11,17 +11,16 @@ class DeckService with ChangeNotifier {
   List<DeckModel> get listOfDecks => _listOfDecks;
   DeckModel? get selectedModel => _selectedModel;
 
-  Future<(DeckOperationStatus, DeckModel?)> addDeck(DeckModel model) async {
+  Future<DeckOperationStatus> addDeck(DeckModel model) async {
     try {
-      DeckModel? updatedModel;
-      updatedModel = await DatabaseService.instance.addDeck(model);
+      DeckModel modelToReturn = await DatabaseService.instance.addDeck(model);
       _listOfDecks = await DatabaseService.instance.getDecks();
       notifyListeners();
-      debugPrint('${updatedModel.deckID}this is the ID number');
-      return (DeckOperationStatus.success, updatedModel);
+      debugPrint('${modelToReturn.deckID}this is the ID number');
+      return (DeckOperationStatus.success);
     } catch (e) {
       debugPrint('Add deck error: $e');
-      return (DeckOperationStatus.failure, null);
+      return (DeckOperationStatus.failure);
     }
   }
 
