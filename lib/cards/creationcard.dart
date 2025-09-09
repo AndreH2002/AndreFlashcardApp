@@ -1,8 +1,11 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as path;
 import '../models/cardmodel.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+
 
 class CreationCard extends StatefulWidget {
   const CreationCard({super.key, required this.model});
@@ -112,16 +115,35 @@ class _CreationCardState extends State<CreationCard> {
 
   //to put in the get image from gallery 
   Future<void> _getImage(ImageSource source, bool isTerm) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: source);
+  final imagePath = await _pickAndSaveImage();
+  if (imagePath == null) return; // user canceled
 
-    if (pickedFile != null) {
-      setState(() {
-        isTerm
-        ?widget.model.termImagePath = pickedFile.path
-        :widget.model.defImagePath = pickedFile.path;
-      });
+  setState(() {
+    if (isTerm) {
+      widget.model.termImagePath = imagePath;
+      debugPrint("Term image path: $imagePath");
+    } else {
+      widget.model.defImagePath = imagePath;
+      debugPrint("Def image path: $imagePath");
     }
+    debugPrint(File(imagePath).existsSync().toString());
+  });
+  }
+
+
+
+  Future<String?> _pickAndSaveImage() async {
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+  if (pickedFile == null) return null;
+
+  final appDir = await getApplicationDocumentsDirectory();
+  final fileName = path.basename(pickedFile.path);
+  final savedImage = await File(pickedFile.path).copy('${appDir.path}/$fileName');
+
+  debugPrint("📸 Saved image at: ${savedImage.path}");
+  return savedImage.path; // use this instead of pickedFile.path
   }
 
   Future<void> _removeImage(bool isTerm) async{
@@ -170,7 +192,8 @@ class _CreationCardState extends State<CreationCard> {
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
-                          ),
+                    errorBuilder: (_, __, ___) => const Icon(Icons.broken_image, size: 50),
+                    ),
                 ),
     );
   }

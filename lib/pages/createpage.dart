@@ -34,6 +34,7 @@ class _CreatePageState extends State<CreatePage> {
   _titleController.dispose();
   super.dispose();
   }
+  
   //adds the deck through the try catch method definded in deckservice
   Future<bool> _addDeckAttempt() async {
     final (status) = await context.read<DeckService>().addDeck(model);
@@ -208,7 +209,8 @@ class _CreatePageState extends State<CreatePage> {
 
               //add button
               ElevatedButton.icon(
-                onPressed: () => setState(() => listOfCards.add(CardModel(term: "", definition: ""))),
+                onPressed: () => setState(() => listOfCards.add(
+                  CardModel(term: "", definition: "", termImagePath: null, defImagePath: null))),
                 icon: const Icon(Icons.add, size: 20),
                 label: const Text('Add Card'),
                 style: ElevatedButton.styleFrom(
@@ -245,4 +247,7 @@ class _CreatePageState extends State<CreatePage> {
   void _checkForNullTerms(List<CardModel>listToCheck) {
     listToCheck.removeWhere((element) => element.term == "" || element.definition == "");
   }
+
+  
+
 }

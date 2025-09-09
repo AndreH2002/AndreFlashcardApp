@@ -22,11 +22,15 @@ class _LearnPageState extends State<LearnPage> {
   late MultipleChoiceWidget currentMultipleChoice;
   WritingWidget? currentWritingWidget;
 
+
+  //set the ints
   late int unlearned;
   int learning = 0;
   int learned = 0;
   int round = 1;
 
+
+  //set the bools
   bool inGame = true;
   bool isMultipleChoice = true;
   bool done = false;
@@ -52,11 +56,17 @@ void initState() {
 
     currentMultipleChoice = MultipleChoiceWidget(
       key:ValueKey(currentCard.term),
+      
       definition: currentCard.definition,
+      
       correctTerm: currentCard.term,
+      
       wrongTerms: currentWrongTerms,
+      
       isClickable: true,
+      
       solveForTerm: solveForTerm,
+      
       model: currentCard,
       onCorrect: () {
        _onClicked(true);
@@ -93,10 +103,14 @@ void initState() {
             begin: Alignment.topLeft, end: Alignment.bottomRight,
           ),
         ),
-        child: Expanded(
-          child: inGame
-              ?_setWidget()
-              :progressWidget(),
+        child: Column(
+          children: [
+            Expanded(
+              child: inGame
+                  ?_setWidget()
+                  :progressWidget(),
+            ),
+          ],
         ),
       ),
     );

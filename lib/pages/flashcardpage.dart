@@ -45,10 +45,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    currentCard = Flashcard(
-      frontText: listOfCards[currentCardIndex].term,
-      backText: listOfCards[currentCardIndex].definition,
-    );
+    currentCard = cardModelToFlashcard(listOfCards[currentCardIndex]);
   }
 
   @override
@@ -101,6 +98,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
           ),
         ],
       ),
+     /**  
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xFF3b038a),
         child: Padding(
@@ -120,6 +118,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
           ),
         ),
       ),
+      */
     );
   }
 
@@ -180,10 +179,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
     currentCardIndex++;
     needStudyingCount++;
     
-    currentCard = Flashcard(
-      frontText: stillLearning[currentCardIndex].term,
-      backText: stillLearning[currentCardIndex].definition,
-    );
+    currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
   } else {
     needStudyingCount++;
     roundFinished = true;
@@ -196,10 +192,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
   if (currentCardIndex < stillLearning.length - 1) {
     masteredCount++;
     stillLearning.removeAt(currentCardIndex);
-    currentCard = Flashcard(
-      frontText: stillLearning[currentCardIndex].term,
-      backText: stillLearning[currentCardIndex].definition,
-    );
+    currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
+    
   } else {
     masteredCount++;
     stillLearning.removeAt(currentCardIndex);
@@ -243,9 +237,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 totalCards = stillLearning.length;
                 roundFinished = false;
           
-                currentCard = Flashcard(
-                  frontText: stillLearning[currentCardIndex].term,
-                 backText: stillLearning[currentCardIndex].definition);
+                currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
           
                 
               });
@@ -269,9 +261,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
               //reset the index and current card to the first in the list
               currentCardIndex = 0;
-              currentCard = Flashcard(
-                frontText: stillLearning[currentCardIndex].term,
-               backText: stillLearning[currentCardIndex].definition);
+              currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
               
               learning = true;
 
@@ -372,4 +362,14 @@ class CircularChartPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
+
+  
 }
+Flashcard cardModelToFlashcard(CardModel model) {
+    return Flashcard(
+      frontText: model.term, 
+      backText: model.definition,
+      frontImagePath: model.termImagePath,
+      backImagePath: model.defImagePath,
+      );
+  }

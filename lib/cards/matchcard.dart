@@ -3,9 +3,10 @@
 import 'package:flutter/material.dart';
 
 class MatchCard extends StatefulWidget {
-  MatchCard({super.key, required this.text, this.partner});
+  MatchCard({super.key, required this.text, this.partner, this.imagePath});
   MatchCard? partner;
   final String text;
+  final String? imagePath;
 
   @override
   State<MatchCard> createState() => _MatchCardState();

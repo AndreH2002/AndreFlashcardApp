@@ -176,8 +176,11 @@ class DatabaseService {
       //if the id is already added to the map then the cards are added  to the list
       if(decksMap.containsKey(deckID)) {
         decksMap[deckID]!.listOfCards.add(
-          CardModel(term: row[CardFields.term] as String,  
+          CardModel(
+          term: row[CardFields.term] as String,  
           definition: row[CardFields.definition] as String,
+          termImagePath: row[CardFields.termImagePath] as String?,
+          defImagePath: row[CardFields.defImagePath] as String?,
         )); 
       }
       //creates a new row in the map if not added
@@ -190,6 +193,8 @@ class DatabaseService {
             CardModel( 
               term: row[CardFields.term] as String,
               definition: row[CardFields.definition] as String,
+              termImagePath: row[CardFields.termImagePath] as String?,
+              defImagePath: row[CardFields.defImagePath] as String?,
             ),
           ]
         );
@@ -213,7 +218,12 @@ class DatabaseService {
     int functionNumOfCards = deckRow.first[DeckFields.numOfCards] as int;
 
     List<CardModel>list = deckRow.map((card) => 
-    CardModel(term: card[CardFields.term] as String, definition: card[CardFields.definition] as String)).toList();
+    CardModel(
+      term: card[CardFields.term] as String, 
+      definition: card[CardFields.definition] as String,
+      termImagePath: card[CardFields.termImagePath] as String?,
+      defImagePath: card[CardFields.defImagePath] as String?
+      )).toList();
     return DeckModel(deckname: functionDeckname, listOfCards: list, numOfCards: functionNumOfCards);
   }
 
@@ -231,7 +241,12 @@ class DatabaseService {
     List<CardModel> list = [];
     //then we put all of these cards into a list 
     for(final card in cardInDeck) {
-      list.add(CardModel(term: card[CardFields.term] as String, definition: card[CardFields.definition] as String));
+      list.add(CardModel(
+        term: card[CardFields.term] as String, 
+        definition: card[CardFields.definition] as String,
+        termImagePath: card[CardFields.termImagePath] as String?,
+        defImagePath: card[CardFields.defImagePath] as String?
+        ));
     }
     
     //we return the deckmodel with the list we collected
@@ -248,6 +263,8 @@ class DatabaseService {
   return result.map((e) => CardModel( 
     term: e[CardFields.term] as String,
     definition: e[CardFields.definition] as String,
+    termImagePath: e[CardFields.termImagePath] as String?,
+    defImagePath: e[CardFields.defImagePath] as String?,
   )).toList();
  } 
 

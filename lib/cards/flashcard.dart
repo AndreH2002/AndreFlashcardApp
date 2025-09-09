@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
+    debugPrint("Front image path is ${widget.frontImagePath} and back image path is ${widget.backImagePath}");
+
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
@@ -47,6 +50,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    
     return GestureDetector(
       onTap: _runAnimation,
       child: AnimatedBuilder(
@@ -66,9 +70,7 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
   Widget _buildTransform(bool isFront){
     String frontText;
     String backText;
-    // ignore: unused_local_variable
     String? frontImagePath;
-    // ignore: unused_local_variable
     String? backImagePath;
 
     if(isFront) {
@@ -105,26 +107,48 @@ class _FlashcardState extends State<Flashcard> with SingleTickerProviderStateMix
 
 
   //creates the card within the transformation
-  Widget _buildCard(String text, String? imagePath) {
-    return Container(
-      decoration: BoxDecoration( 
-        gradient: const LinearGradient(
-                    colors: [Color(0xFF7D5FFF), Color(0xFFB17FFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-        ),
-
-        borderRadius: BorderRadius.circular(10),
+ Widget _buildCard(String text, String? imagePath) {
+  return Container(
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF7D5FFF), Color(0xFFB17FFF)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
       ),
-      child: Center(
-            child: Text(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (imagePath != null)
+          Center(
+            child: SizedBox(
+              height: 150, 
+              width: double.infinity,
+              child: Image.file(
+                File(imagePath),
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Icon(Icons.broken_image, size: 48, color: Colors.white);
+                },
+              ),
+            ),
+          ),
+        const SizedBox(height: 12),
+        Center(
+          child: Text(
             text,
             style: const TextStyle(color: Colors.white, fontSize: 20),
-            ),
-      ),
-      
-    );
-  }
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   //runs the animation
   void _runAnimation() {

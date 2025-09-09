@@ -70,6 +70,8 @@ class _DeckPageState extends State<DeckPage> {
                       child: Flashcard(
                         frontText: listOfCards[index].term,
                         backText: listOfCards[index].definition,
+                        frontImagePath: listOfCards[index].termImagePath,
+                        backImagePath: listOfCards[index].defImagePath,
                       ),
                     ),
                   );
