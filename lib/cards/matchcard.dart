@@ -20,10 +20,9 @@ class _MatchCardState extends State<MatchCard> {
     super.initState();
     text = widget.text;
   }
+
   @override
   Widget build(BuildContext context) {
-    
     return Text(text);
   }
 }
-

@@ -15,16 +15,13 @@ class CardModel {
   String? defImagePath;
   LearnStatus? learnStatus;
 
-  CardModel({
-    required this.term,
-    required this.definition,
-    this.termImagePath,
-    this.defImagePath,
-    this.learnStatus,
-    this.listID
-  });
+  CardModel(
+      {required this.term,
+      required this.definition,
+      this.termImagePath,
+      this.defImagePath,
+      this.learnStatus,
+      this.listID});
 }
 
-enum LearnStatus {
-  unlearned, learning, learned
-}
+enum LearnStatus { unlearned, learning, learned }

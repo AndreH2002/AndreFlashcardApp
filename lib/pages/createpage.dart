@@ -5,9 +5,9 @@ import '../cards/creationcard.dart';
 import '../models/deckmodel.dart';
 import '../services/deckprovider.dart';
 
-
 class CreatePage extends StatefulWidget {
- const CreatePage({super.key, required this.deckModel, required this.isAlreadyCreated});
+  const CreatePage(
+      {super.key, required this.deckModel, required this.isAlreadyCreated});
   final DeckModel deckModel;
   final bool isAlreadyCreated;
   @override
@@ -30,29 +30,28 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   @override
-  void dispose(){
-  _titleController.dispose();
-  super.dispose();
+  void dispose() {
+    _titleController.dispose();
+    super.dispose();
   }
-  
+
   //adds the deck through the try catch method definded in deckservice
   Future<bool> _addDeckAttempt() async {
     final (status) = await context.read<DeckService>().addDeck(model);
     if (status == DeckOperationStatus.success) {
       debugPrint(model.deckID.toString());
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
   Future<bool> _updateDeckAttempt() async {
-    DeckOperationStatus result = await context.read<DeckService>().updateDeck(model);
-    if(result == DeckOperationStatus.success) {
+    DeckOperationStatus result =
+        await context.read<DeckService>().updateDeck(model);
+    if (result == DeckOperationStatus.success) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
@@ -70,79 +69,70 @@ class _CreatePageState extends State<CreatePage> {
         actions: [
           TextButton(
             onPressed: () async {
-            // 1. Check for empty title or empty card list
-          if (titleString.isEmpty || listOfCards.isEmpty) {
-          if (!context.mounted) return;
-            ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Deck title or cards cannot be empty')),
-          );
-          return;
-          }
+              // 1. Check for empty title or empty card list
+              if (titleString.isEmpty || listOfCards.isEmpty) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text('Deck title or cards cannot be empty')),
+                );
+                return;
+              }
 
-        // 2. Check for duplicate title
-        final exists = await context.read<DeckService>().deckNameExists(titleString);
-    if (exists == true && titleString != widget.deckModel.deckname) {
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Deck title already exists')),
-    );
-    return;
-  }
+              // 2. Check for duplicate title
+              final exists =
+                  await context.read<DeckService>().deckNameExists(titleString);
+              if (exists == true && titleString != widget.deckModel.deckname) {
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Deck title already exists')),
+                );
+                return;
+              }
 
-  // 3. Clean up card list (remove null terms etc.)
-  _checkForNullTerms(listOfCards);
+              // 3. Clean up card list (remove null terms etc.)
+              _checkForNullTerms(listOfCards);
 
-  //4. update DeckModel with the title and num of cards
-  model.deckname = titleString;
-  model.listOfCards = listOfCards;
-  model.numOfCards = listOfCards.length;
+              //4. update DeckModel with the title and num of cards
+              model.deckname = titleString;
+              model.listOfCards = listOfCards;
+              model.numOfCards = listOfCards.length;
 
-  // 5. Attempt to add deck 
+              // 5. Attempt to add deck
 
-  if(widget.isAlreadyCreated) {
-    final success = await _updateDeckAttempt();
-      if(!context.mounted) return;
+              if (widget.isAlreadyCreated) {
+                final success = await _updateDeckAttempt();
+                if (!context.mounted) return;
 
-      if(success) {
-        if(context.mounted) {
-          Navigator.pop(context);
-        }
-        
-      }
-      else {
-        if(context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(  
-          const SnackBar(content: Text('Failed to update deck')),
-        );
-        }
-        
-      }
-  }
-  else{
-    final success = await _addDeckAttempt();
-    debugPrint('After adding deck, model.deckID = ${model.deckID}');
-      if (!context.mounted) return;
+                if (success) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Failed to update deck')),
+                    );
+                  }
+                }
+              } else {
+                final success = await _addDeckAttempt();
+                debugPrint('After adding deck, model.deckID = ${model.deckID}');
+                if (!context.mounted) return;
 
-      if (success) {
-        if(context.mounted) {
-          Navigator.pop(context);
-        }
-      }
-      else {
-        if(context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to add deck')));
-        }
-       
-      }
-      
-    }
-    
-  },
-          
-    
-          
-      child: const Text(
+                if (success) {
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                  }
+                } else {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to add deck')));
+                  }
+                }
+              }
+            },
+            child: const Text(
               'Done',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
@@ -151,21 +141,21 @@ class _CreatePageState extends State<CreatePage> {
       ),
       body: Column(
         children: [
-
           //title field
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
-              decoration: InputDecoration(
-                labelText: 'Deck Title',
-                labelStyle: const TextStyle(fontSize: 18, color: Colors.black54),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+                decoration: InputDecoration(
+                  labelText: 'Deck Title',
+                  labelStyle:
+                      const TextStyle(fontSize: 18, color: Colors.black54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
                 ),
-              ),
-              controller: _titleController,
-              onChanged: (value) => titleString = value),
-            ),
+                controller: _titleController,
+                onChanged: (value) => titleString = value),
+          ),
 
           //builder of all the different creation cards
 
@@ -206,17 +196,21 @@ class _CreatePageState extends State<CreatePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               //add button
               ElevatedButton.icon(
-                onPressed: () => setState(() => listOfCards.add(
-                  CardModel(term: "", definition: "", termImagePath: null, defImagePath: null))),
+                onPressed: () => setState(() => listOfCards.add(CardModel(
+                    term: "",
+                    definition: "",
+                    termImagePath: null,
+                    defImagePath: null))),
                 icon: const Icon(Icons.add, size: 20),
                 label: const Text('Add Card'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF7D5FFF),
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
               ),
 
@@ -231,8 +225,10 @@ class _CreatePageState extends State<CreatePage> {
                 label: const Text('Remove Last'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.redAccent,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],
@@ -244,10 +240,8 @@ class _CreatePageState extends State<CreatePage> {
   }
 
   //we need a function to remove any cards that don't have any text in the term or definition
-  void _checkForNullTerms(List<CardModel>listToCheck) {
-    listToCheck.removeWhere((element) => element.term == "" || element.definition == "");
+  void _checkForNullTerms(List<CardModel> listToCheck) {
+    listToCheck.removeWhere(
+        (element) => element.term == "" || element.definition == "");
   }
-
-  
-
 }

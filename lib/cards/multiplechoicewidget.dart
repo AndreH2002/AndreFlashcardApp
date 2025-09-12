@@ -14,7 +14,7 @@ class MultipleChoiceWidget extends StatefulWidget {
 
   final VoidCallback? onCorrect;
   final VoidCallback? onWrong;
-  final VoidCallback?roundFinished;
+  final VoidCallback? roundFinished;
 
   bool isClickable;
 
@@ -68,11 +68,12 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
         choiceColors[selectedTerm] = Colors.greenAccent;
         choiceIcons[selectedTerm] = Icon(Icons.check_box, color: Colors.white);
         if (widget.onCorrect != null) widget.onCorrect!();
-      } 
+      }
       //red if wrong
       else {
         choiceColors[selectedTerm] = Colors.redAccent;
-        choiceIcons[selectedTerm] = Icon(Icons.remove_circle, color: Colors.white);
+        choiceIcons[selectedTerm] =
+            Icon(Icons.remove_circle, color: Colors.white);
         if (widget.onWrong != null) widget.onWrong!();
       }
 
@@ -96,7 +97,8 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
               final width = constraint.maxWidth;
               return SingleChildScrollView(
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: height, minWidth: width),
+                  constraints:
+                      BoxConstraints(minHeight: height, minWidth: width),
                   child: Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -106,7 +108,9 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
                           textScaler: TextScaler.linear(2.0),
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 10,),
+                        SizedBox(
+                          height: 10,
+                        ),
                         imageDisplay(),
                       ],
                     ),
@@ -125,7 +129,7 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
               final term = terms[index];
               return GestureDetector(
                 onTap: () {
-                  if(isClickable) {
+                  if (isClickable) {
                     handleChoice(term);
                     isClickable = false;
                   }
@@ -173,19 +177,20 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
 
   Widget imageDisplay() {
     String? imagePath = widget.solveForTerm
-    ? widget.model.defImagePath
-    : widget.model.termImagePath;
+        ? widget.model.defImagePath
+        : widget.model.termImagePath;
 
-    if(imagePath == null) {
+    if (imagePath == null) {
       return const SizedBox.shrink();
     }
-    return ClipRRect(  
+    return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Image.file(File(
-        imagePath,
-      ),
-      height: 150,
-      width: 150,
+      child: Image.file(
+        File(
+          imagePath,
+        ),
+        height: 150,
+        width: 150,
       ),
     );
   }

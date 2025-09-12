@@ -10,10 +10,8 @@ class DeckFields {
 class DeckModel {
   int? deckID;
   String deckname;
-  List<CardModel>listOfCards;
+  List<CardModel> listOfCards;
   int numOfCards;
-  
-
 
   DeckModel({
     this.deckID,
@@ -27,15 +25,11 @@ class DeckModel {
     String? deckname,
     List<CardModel>? listOfCards,
     int? numOfCards,
-  
-
-  }) => 
-    DeckModel(
-      deckID: deckID ?? this.deckID,
-      deckname: deckname ?? this.deckname,
-      listOfCards: listOfCards ?? this.listOfCards,
-      numOfCards: numOfCards ?? this.numOfCards,
-
-    );
-  
+  }) =>
+      DeckModel(
+        deckID: deckID ?? this.deckID,
+        deckname: deckname ?? this.deckname,
+        listOfCards: listOfCards ?? this.listOfCards,
+        numOfCards: numOfCards ?? this.numOfCards,
+      );
 }

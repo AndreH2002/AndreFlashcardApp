@@ -19,14 +19,11 @@ class _MatchTimerState extends State<MatchTimer> {
   void initState() {
     super.initState();
 
-    timer = Timer.periodic(const Duration(milliseconds: 100),
-    (Timer timer) {
+    timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
       setState(() {
         context.read<TimerProvider>().updateTime();
       });
     });
-
-    
   }
 
   @override
@@ -34,7 +31,7 @@ class _MatchTimerState extends State<MatchTimer> {
     super.dispose();
     timer.cancel();
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return formatTime(context.watch<TimerProvider>().duration);
@@ -42,9 +39,9 @@ class _MatchTimerState extends State<MatchTimer> {
 
   Widget formatTime(Duration duration) {
     String seconds = duration.inSeconds.toString();
-    String milliseconds = (duration.inMilliseconds.remainder(1000) ~/ 100).toString();
+    String milliseconds =
+        (duration.inMilliseconds.remainder(1000) ~/ 100).toString();
 
     return Text('$seconds.$milliseconds');
   }
 }
-

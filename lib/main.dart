@@ -8,7 +8,7 @@ import 'package:revised_flashcard_application/services/tts_provider.dart';
 
 import 'services/database_service.dart';
 
-void main(){
+void main() {
   runApp(const MainApp());
 }
 
@@ -20,28 +20,29 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
-
   @override
   void dispose() {
     super.dispose();
     DatabaseService.instance.close();
   }
+
   @override
   Widget build(BuildContext context) {
-      return MultiProvider(
-        
-        providers: [
-          ChangeNotifierProvider(create: (context) => DeckService(),
-          ),
-          ChangeNotifierProvider(create: (context) => TimerProvider(),
-          ),
-          ChangeNotifierProvider(create: (context) => TtsProvider(),
-          ),
-
-        ],
-          child: const MaterialApp(
-            home: HomePage(),
-          ),
-      );
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => DeckService(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TimerProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => TtsProvider(),
+        ),
+      ],
+      child: const MaterialApp(
+        home: HomePage(),
+      ),
+    );
   }
 }

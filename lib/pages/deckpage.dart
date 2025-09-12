@@ -80,10 +80,10 @@ class _DeckPageState extends State<DeckPage> {
             ),
           ),
 
-
           // Deck Info Section
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
             child: Column(
               children: [
                 Row(
@@ -97,8 +97,8 @@ class _DeckPageState extends State<DeckPage> {
                         color: Colors.black87,
                       ),
                     ),
-
-                    IconButton(onPressed: _goToCreatePage, icon: Icon(Icons.edit)),
+                    IconButton(
+                        onPressed: _goToCreatePage, icon: Icon(Icons.edit)),
                   ],
                 ),
                 Text(
@@ -119,32 +119,31 @@ class _DeckPageState extends State<DeckPage> {
               child: ListView(
                 children: [
                   _buildNavigationOption(
-                    
                     label: 'Flashcards',
                     onTap: () {
-                      if(listOfCards.isNotEmpty) {
+                      if (listOfCards.isNotEmpty) {
                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => FlashcardPage(deckModel: deckModel),
-                        ),
-                      );
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                FlashcardPage(deckModel: deckModel),
+                          ),
+                        );
                       }
-                      
                     },
                   ),
                   _buildNavigationOption(
                     label: 'Learn',
                     onTap: () {
-                      if(listOfCards.isNotEmpty && listOfCards.length > 4) {
-                         Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LearnPage(deckModel: deckModel),
-                        ),
-                      );
+                      if (listOfCards.isNotEmpty && listOfCards.length > 4) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                LearnPage(deckModel: deckModel),
+                          ),
+                        );
                       }
-                     
                     },
                   ),
                   _buildNavigationOption(
@@ -156,19 +155,20 @@ class _DeckPageState extends State<DeckPage> {
                   _buildNavigationOption(
                     label: 'Match',
                     onTap: () {
-                      if(listOfCards.isNotEmpty) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MatchPage(deckModel: deckModel),
-                        ),
-                      );
-                      }
-                      else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Error, list is empty'),),
+                      if (listOfCards.isNotEmpty) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                MatchPage(deckModel: deckModel),
+                          ),
                         );
-
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Error, list is empty'),
+                          ),
+                        );
                       }
                     },
                   ),
@@ -181,7 +181,8 @@ class _DeckPageState extends State<DeckPage> {
     );
   }
 
-  Widget _buildNavigationOption({required String label, required VoidCallback onTap}) {
+  Widget _buildNavigationOption(
+      {required String label, required VoidCallback onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: GestureDetector(
@@ -213,13 +214,15 @@ class _DeckPageState extends State<DeckPage> {
     );
   }
 
-
   void _goToCreatePage() {
     Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => CreatePage(deckModel: widget.deckModel, isAlreadyCreated: true,),
-            ),
-          );
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreatePage(
+          deckModel: widget.deckModel,
+          isAlreadyCreated: true,
+        ),
+      ),
+    );
   }
 }

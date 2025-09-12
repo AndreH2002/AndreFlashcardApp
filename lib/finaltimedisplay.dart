@@ -43,7 +43,8 @@ class _FinalTimeDisplayState extends State<FinalTimeDisplay> {
             ],
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

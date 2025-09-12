@@ -30,7 +30,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
   // State control for round completion
   bool roundFinished = false;
-  
+
   //once its false the still learning button doesnt appear again
   bool learning = true;
 
@@ -89,16 +89,14 @@ class _FlashcardPageState extends State<FlashcardPage> {
             ],
           ),
           const SizedBox(height: 16),
-      
+
           // Flashcard or finished widget
           Expanded(
-            child: roundFinished
-                ? finishedContainer()
-                : _buildFlashcardView(),
+            child: roundFinished ? finishedContainer() : _buildFlashcardView(),
           ),
         ],
       ),
-     /**  
+      /**  
       bottomNavigationBar: BottomAppBar(
         color: const Color(0xFF3b038a),
         child: Padding(
@@ -126,7 +124,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
     return Stack(
       children: [
         Positioned.fill(
-          child: Align(alignment: Alignment.centerLeft, child: dragTarget(true)),
+          child:
+              Align(alignment: Alignment.centerLeft, child: dragTarget(true)),
         ),
         Center(
           child: LayoutBuilder(
@@ -151,7 +150,8 @@ class _FlashcardPageState extends State<FlashcardPage> {
           ),
         ),
         Positioned.fill(
-          child: Align(alignment: Alignment.centerRight, child: dragTarget(false)),
+          child:
+              Align(alignment: Alignment.centerRight, child: dragTarget(false)),
         ),
       ],
     );
@@ -174,34 +174,30 @@ class _FlashcardPageState extends State<FlashcardPage> {
   }
 
   void _needsStudying() {
-   
-  if (currentCardIndex < stillLearning.length - 1) {
-    currentCardIndex++;
-    needStudyingCount++;
-    
-    currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
-  } else {
-    needStudyingCount++;
-    roundFinished = true;
-  }
+    if (currentCardIndex < stillLearning.length - 1) {
+      currentCardIndex++;
+      needStudyingCount++;
 
+      currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
+    } else {
+      needStudyingCount++;
+      roundFinished = true;
+    }
   }
 
   void _mastered() {
-   
-  if (currentCardIndex < stillLearning.length - 1) {
-    masteredCount++;
-    stillLearning.removeAt(currentCardIndex);
-    currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
-    
-  } else {
-    masteredCount++;
-    stillLearning.removeAt(currentCardIndex);
-    if(stillLearning.isEmpty) {
-      learning = false;
+    if (currentCardIndex < stillLearning.length - 1) {
+      masteredCount++;
+      stillLearning.removeAt(currentCardIndex);
+      currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
+    } else {
+      masteredCount++;
+      stillLearning.removeAt(currentCardIndex);
+      if (stillLearning.isEmpty) {
+        learning = false;
+      }
+      roundFinished = true;
     }
-    roundFinished = true;
-  }
   }
 
   Widget finishedContainer() {
@@ -211,12 +207,14 @@ class _FlashcardPageState extends State<FlashcardPage> {
         // Stats Section
         Text(
           'Still Learning: $needStudyingCount',
-          style: TextStyle(fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 18, color: Colors.red, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
         Text(
           'Mastered: $masteredCount',
-          style: TextStyle(fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold),
+          style: TextStyle(
+              fontSize: 18, color: Colors.green, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 16),
 
@@ -236,40 +234,36 @@ class _FlashcardPageState extends State<FlashcardPage> {
                 masteredCount = 0;
                 totalCards = stillLearning.length;
                 roundFinished = false;
-          
-                currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
-          
-                
+
+                currentCard =
+                    cardModelToFlashcard(stillLearning[currentCardIndex]);
               });
-            }, 
+            },
             child: const Text('Continue Studying'),
           ),
         ),
         const SizedBox(height: 8),
         ElevatedButton(
           onPressed: () {
-
             //clear the list and reset it to the listOfCards
             setState(() {
-
               needStudyingCount = 0;
               masteredCount = 0;
 
-              
               totalCards = listOfCards.length;
               stillLearning = List.from(listOfCards);
 
               //reset the index and current card to the first in the list
               currentCardIndex = 0;
-              currentCard = cardModelToFlashcard(stillLearning[currentCardIndex]);
-              
-              learning = true;
+              currentCard =
+                  cardModelToFlashcard(stillLearning[currentCardIndex]);
 
+              learning = true;
 
               //go back to flashcard screen
               roundFinished = false;
             });
-          }, 
+          },
           child: const Text('Restart Flashcards'),
         ),
       ],
@@ -307,13 +301,15 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
     return Stack(
       alignment: Alignment.center,
-        children: [
+      children: [
         CustomPaint(
           size: const Size(100, 100),
           painter: CircularChartPainter(masteredPercentage: masteredPercentage),
         ),
-
-        Text(toText, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),)
+        Text(
+          toText,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        )
       ],
     );
   }
@@ -362,14 +358,13 @@ class CircularChartPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
   }
-
-  
 }
+
 Flashcard cardModelToFlashcard(CardModel model) {
-    return Flashcard(
-      frontText: model.term, 
-      backText: model.definition,
-      frontImagePath: model.termImagePath,
-      backImagePath: model.defImagePath,
-      );
-  }
+  return Flashcard(
+    frontText: model.term,
+    backText: model.definition,
+    frontImagePath: model.termImagePath,
+    backImagePath: model.defImagePath,
+  );
+}

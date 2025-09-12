@@ -4,7 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:revised_flashcard_application/models/cardmodel.dart';
 
 class WritingWidget extends StatefulWidget {
-  const WritingWidget({super.key, required this.model, required this.solveForTerm, required this.onCorrect, required this.onWrong});
+  const WritingWidget(
+      {super.key,
+      required this.model,
+      required this.solveForTerm,
+      required this.onCorrect,
+      required this.onWrong});
 
   final CardModel model;
   final bool solveForTerm;
@@ -15,9 +20,7 @@ class WritingWidget extends StatefulWidget {
   State<WritingWidget> createState() => _WritingWidgetState();
 }
 
-enum Status{ 
-  typing, correct, incorrect
-}
+enum Status { typing, correct, incorrect }
 
 class _WritingWidgetState extends State<WritingWidget> {
   late String term;
@@ -43,80 +46,77 @@ class _WritingWidgetState extends State<WritingWidget> {
     super.dispose();
     _controller.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
-    return Column( 
-      children: [ 
+    return Column(
+      children: [
         Flexible(flex: 1, child: Container()),
         Expanded(
           flex: 1,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(definition, textScaler: TextScaler.linear(2.0),),
-              SizedBox(height:10),
+              Text(
+                definition,
+                textScaler: TextScaler.linear(2.0),
+              ),
+              SizedBox(height: 10),
               imageDisplay(),
             ],
           ),
         ),
-       
-        Flexible(flex: 1, 
-        child: _displayedWidget()
-        ),
-          
+        Flexible(flex: 1, child: _displayedWidget()),
       ],
     );
   }
 
   Widget _displayedWidget() {
-    if(status == Status.typing) {
+    if (status == Status.typing) {
       return TextField(
-          decoration: InputDecoration(
-            labelText: "Enter term"
-          ),
-          controller: _controller,
-          onSubmitted: (value) {
-            _checkAnswer(_controller.text);
-          },
-          );
-    }
-    else if (status == Status.correct) {
+        decoration: InputDecoration(labelText: "Enter term"),
+        controller: _controller,
+        onSubmitted: (value) {
+          _checkAnswer(_controller.text);
+        },
+      );
+    } else if (status == Status.correct) {
       return _correct();
-    }
-    else {
+    } else {
       return _incorrect();
     }
   }
 
-
   void _checkAnswer(String text) {
     setState(() {
-      if(text.toLowerCase() == term.toLowerCase()) {
-      status = Status.correct;
-      widget.onCorrect();
-    }
-    else {
-      status = Status.incorrect;
-      widget.onWrong();
-    }
+      if (text.toLowerCase() == term.toLowerCase()) {
+        status = Status.correct;
+        widget.onCorrect();
+      } else {
+        status = Status.incorrect;
+        widget.onWrong();
+      }
     });
-    
   }
 
   Widget _correct() {
     return Row(
-    mainAxisAlignment: MainAxisAlignment.center,
-    children: [ 
-      Text('Correct!', style: TextStyle(color: Colors.redAccent)),
-      Icon(Icons.check_box, color: Colors.greenAccent),
-    ],);
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('Correct!', style: TextStyle(color: Colors.redAccent)),
+        Icon(Icons.check_box, color: Colors.greenAccent),
+      ],
+    );
   }
 
   Widget _incorrect() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [ 
-        Text('Incorrect!', style: TextStyle(color: Colors.redAccent),),
+      children: [
+        Text(
+          'Incorrect!',
+          style: TextStyle(color: Colors.redAccent),
+        ),
         Icon(Icons.cancel, color: Colors.redAccent),
       ],
     );
@@ -124,19 +124,20 @@ class _WritingWidgetState extends State<WritingWidget> {
 
   Widget imageDisplay() {
     String? imagePath = widget.solveForTerm
-    ? widget.model.defImagePath
-    : widget.model.termImagePath;
+        ? widget.model.defImagePath
+        : widget.model.termImagePath;
 
-    if(imagePath == null) {
+    if (imagePath == null) {
       return const SizedBox.shrink();
     }
-    return ClipRRect(  
+    return ClipRRect(
       borderRadius: BorderRadius.circular(8),
-      child: Image.file(File(
-        imagePath,
-      ),
-      height: 150,
-      width: 150,
+      child: Image.file(
+        File(
+          imagePath,
+        ),
+        height: 150,
+        width: 150,
       ),
     );
   }

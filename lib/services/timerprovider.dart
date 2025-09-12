@@ -6,18 +6,14 @@ class TimerProvider extends ChangeNotifier {
   Stopwatch stopwatch = Stopwatch();
   Duration duration = Duration.zero;
 
-
-
   void startTime() {
     timer?.cancel;
     stopwatch.stop();
 
     stopwatch.start();
-    timer = Timer.periodic(const Duration(milliseconds: 100), 
-      (Timer timer) {
-        duration = stopwatch.elapsed;
-      }
-    ) ;
+    timer = Timer.periodic(const Duration(milliseconds: 100), (Timer timer) {
+      duration = stopwatch.elapsed;
+    });
 
     notifyListeners();
   }
@@ -40,5 +36,4 @@ class TimerProvider extends ChangeNotifier {
     duration = stopwatch.elapsed;
     notifyListeners();
   }
-
 }

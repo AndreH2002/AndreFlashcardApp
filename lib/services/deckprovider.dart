@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/deckmodel.dart';
 import 'database_service.dart';
 
-enum DeckOperationStatus { success, failure}
+enum DeckOperationStatus { success, failure }
 
 class DeckService with ChangeNotifier {
   DeckModel? _selectedModel;
@@ -58,7 +58,8 @@ class DeckService with ChangeNotifier {
 
   Future<DeckOperationStatus> getDeckModelFromName(String deckname) async {
     try {
-      _selectedModel = await DatabaseService.instance.getDeckModelFromName(deckname);
+      _selectedModel =
+          await DatabaseService.instance.getDeckModelFromName(deckname);
       notifyListeners();
       return DeckOperationStatus.success;
     } catch (e) {
@@ -77,7 +78,7 @@ class DeckService with ChangeNotifier {
       return DeckOperationStatus.success;
     } catch (e, stackTrace) {
       debugPrint('getDeckList error: $e');
-       debugPrintStack(stackTrace: stackTrace);
+      debugPrintStack(stackTrace: stackTrace);
 
       return DeckOperationStatus.failure;
     }
@@ -92,8 +93,8 @@ class DeckService with ChangeNotifier {
     }
   }
 
-  Future<DeckOperationStatus> updateDeck(DeckModel deckToUpdate) async{
-    try{
+  Future<DeckOperationStatus> updateDeck(DeckModel deckToUpdate) async {
+    try {
       await DatabaseService.instance.updateDeck(deckToUpdate);
       _listOfDecks = await DatabaseService.instance.getDecks();
       notifyListeners();

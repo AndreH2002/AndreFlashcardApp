@@ -14,39 +14,35 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   Future<DeckOperationStatus>? _deckFetchFuture;
   @override
   void initState() {
-    
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      
       setState(() {
         _deckFetchFuture = context.read<DeckService>().getDeckList();
       }); // trigger rebuild once future is ready
-  });
+    });
   }
 
-  //this attempts to get the deck list 
+  //this attempts to get the deck list
   Future<bool> fetchAttempt() async {
     DeckOperationStatus fetch = await context.read<DeckService>().getDeckList();
     if (fetch == DeckOperationStatus.success) {
       return true;
-    }
-    else {
+    } else {
       return false;
     }
   }
 
   //this attempts to remove the deck
   Future<bool> awaitAttempt(int deckId) async {
-    DeckOperationStatus removalAttempt = await context.read<DeckService>().removeDeck(deckId);
+    DeckOperationStatus removalAttempt =
+        await context.read<DeckService>().removeDeck(deckId);
 
-    if(removalAttempt == DeckOperationStatus.success) {
+    if (removalAttempt == DeckOperationStatus.success) {
       return true;
-    } 
-    else {
+    } else {
       return false;
     }
   }
@@ -67,11 +63,10 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
       ),
 
-      //body 
+      //body
       body: Column(
         children: [
-
-          //creation button and header 
+          //creation button and header
           _buildCreateDeckButton(),
           const SizedBox(height: 10),
           _buildHeader(),
@@ -79,33 +74,35 @@ class _HomePageState extends State<HomePage> {
 
           //this is where the actual decks are stored if any
           Expanded(
-            child: 
-            _deckFetchFuture == null
-            ? const Center(child: CircularProgressIndicator())
-            :FutureBuilder<DeckOperationStatus>(
-            future: _deckFetchFuture,
-            builder: (context, snapshot) {
-            debugPrint('FutureBuilder: state=${snapshot.connectionState}, hasData=${snapshot.hasData}, data=${snapshot.data}, hasError=${snapshot.hasError}');
-          //loading symbol if decks aren't pulled up yet
-           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-            //detected error
-           } else if (snapshot.hasError) {
-              return const Center(child: Text('Error loading data'));
-                //success
-              } else if (snapshot.data == DeckOperationStatus.success) {
-                final decks = context.watch<DeckService>().listOfDecks;
-                debugPrint('Decks in provider: ${context.read<DeckService>().listOfDecks.length}');
-                  return decks.isEmpty
-                    ? const Center(child: Text('No decks available'))
-                    : _buildDeckList();
-                    //some other sort of weird error
-                } else {
-                  return const Center(child: Text('Failed to load deck data'));
-              }
-            },
+            child: _deckFetchFuture == null
+                ? const Center(child: CircularProgressIndicator())
+                : FutureBuilder<DeckOperationStatus>(
+                    future: _deckFetchFuture,
+                    builder: (context, snapshot) {
+                      debugPrint(
+                          'FutureBuilder: state=${snapshot.connectionState}, hasData=${snapshot.hasData}, data=${snapshot.data}, hasError=${snapshot.hasError}');
+                      //loading symbol if decks aren't pulled up yet
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                        //detected error
+                      } else if (snapshot.hasError) {
+                        return const Center(child: Text('Error loading data'));
+                        //success
+                      } else if (snapshot.data == DeckOperationStatus.success) {
+                        final decks = context.watch<DeckService>().listOfDecks;
+                        debugPrint(
+                            'Decks in provider: ${context.read<DeckService>().listOfDecks.length}');
+                        return decks.isEmpty
+                            ? const Center(child: Text('No decks available'))
+                            : _buildDeckList();
+                        //some other sort of weird error
+                      } else {
+                        return const Center(
+                            child: Text('Failed to load deck data'));
+                      }
+                    },
+                  ),
           ),
-        ),
         ],
       ),
     );
@@ -120,15 +117,18 @@ class _HomePageState extends State<HomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => CreatePage(deckModel: DeckModel(deckname: "New Deck", listOfCards: [], numOfCards: 0), 
-                                      isAlreadyCreated: false,),
+              builder: (context) => CreatePage(
+                deckModel: DeckModel(
+                    deckname: "New Deck", listOfCards: [], numOfCards: 0),
+                isAlreadyCreated: false,
+              ),
             ),
           );
           if (mounted) {
-          setState(() {
-         _deckFetchFuture = context.read<DeckService>().getDeckList();
-        });
-  }
+            setState(() {
+              _deckFetchFuture = context.read<DeckService>().getDeckList();
+            });
+          }
         },
         icon: const Icon(Icons.add),
         label: const Text('Create New Deck'),
@@ -136,7 +136,8 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 20.0),
           backgroundColor: const Color(0xFF7D5FFF),
           textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
     );
@@ -161,7 +162,8 @@ class _HomePageState extends State<HomePage> {
               direction: DismissDirection.startToEnd,
               confirmDismiss: (direction) async {
                 if (direction == DismissDirection.startToEnd) {
-                  final bool? confirmed = await _showDeleteConfirmation(deck.deckname, index, deckService);
+                  final bool? confirmed = await _showDeleteConfirmation(
+                      deck.deckname, index, deckService);
                   return confirmed ?? false;
                 }
                 return false;
@@ -174,7 +176,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildDeckRow(DeckModel deck,String deckname, int numOfCards) {
+  Widget _buildDeckRow(DeckModel deck, String deckname, int numOfCards) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -189,7 +191,8 @@ class _HomePageState extends State<HomePage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 4,
         child: ListTile(
-          title: Text(deckname, style: const TextStyle(fontWeight: FontWeight.bold)),
+          title: Text(deckname,
+              style: const TextStyle(fontWeight: FontWeight.bold)),
           trailing: Text(
             '$numOfCards cards',
             style: const TextStyle(color: Colors.black54),
@@ -199,43 +202,44 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
   //this handles the logic behind deleteing a deck which is used using the swipe feature
-  Future<bool?> _showDeleteConfirmation(String deckName, int index, DeckService deckService) {
+  Future<bool?> _showDeleteConfirmation(
+      String deckName, int index, DeckService deckService) {
     return showDialog<bool>(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: const Text('Delete Deck'),
-          content: Text('Are you sure you want to delete the deck "$deckName"?'),
+          content:
+              Text('Are you sure you want to delete the deck "$deckName"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-  onPressed: () {
-    DatabaseService.instance.getDeckId(deckName).then((deckId) {
-      awaitAttempt(deckId).then((success) {
-        if (!context.mounted) return;
+              onPressed: () {
+                DatabaseService.instance.getDeckId(deckName).then((deckId) {
+                  awaitAttempt(deckId).then((success) {
+                    if (!context.mounted) return;
 
-        if (success) {
-          deckService.getDeckList().then((_) {
-            if (!context.mounted) return;
-            setState(() {});
-            Navigator.of(context).pop(true);
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to delete deck')),
-          );
-          Navigator.of(context).pop(false);
-        }
-      });
-    });
-  },
-  child: const Text('Delete'),
-),
+                    if (success) {
+                      deckService.getDeckList().then((_) {
+                        if (!context.mounted) return;
+                        setState(() {});
+                        Navigator.of(context).pop(true);
+                      });
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to delete deck')),
+                      );
+                      Navigator.of(context).pop(false);
+                    }
+                  });
+                });
+              },
+              child: const Text('Delete'),
+            ),
           ],
         );
       },
