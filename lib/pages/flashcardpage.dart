@@ -364,7 +364,7 @@ Flashcard cardModelToFlashcard(CardModel model) {
   return Flashcard(
     frontText: model.term,
     backText: model.definition,
-    frontImagePath: model.termImagePath,
-    backImagePath: model.defImagePath,
+    frontImageFileName: model.termImagePath,
+    backImageFileName: model.defImagePath,
   );
 }

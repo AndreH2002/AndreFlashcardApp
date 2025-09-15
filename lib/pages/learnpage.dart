@@ -13,13 +13,15 @@ class LearnPage extends StatefulWidget {
   State<LearnPage> createState() => _LearnPageState();
 }
 
+enum GameStatus{inGame, inBetween, done}
+enum TypeStatus{multipleChoice, writing}
+
 class _LearnPageState extends State<LearnPage> {
   late List<CardModel> listOfCards;
   late CardModel currentCard;
   late List<String> currentWrongTerms;
 
-  late MultipleChoiceWidget currentMultipleChoice;
-  WritingWidget? currentWritingWidget;
+  late Widget currentWidget;
 
   //set the ints
   late int unlearned;
@@ -27,16 +29,22 @@ class _LearnPageState extends State<LearnPage> {
   int learned = 0;
   int round = 1;
 
+
+  //define game and type status
+  late GameStatus gameStatus; 
+  late TypeStatus typeStatus;
+
   //set the bools
-  bool inGame = true;
-  bool isMultipleChoice = true;
-  bool done = false;
   bool solveForTerm = true;
 
   @override
   void initState() {
     super.initState();
     listOfCards = List.from(widget.deckModel.listOfCards);
+
+    gameStatus = GameStatus.inGame;
+    typeStatus = TypeStatus.multipleChoice;
+
     for (CardModel model in listOfCards) {
       model.learnStatus = LearnStatus.unlearned;
     }
@@ -52,7 +60,7 @@ class _LearnPageState extends State<LearnPage> {
       currentWrongTerms =
           _getWrongTerms(currentCard.term, currentCard.definition);
 
-      currentMultipleChoice = MultipleChoiceWidget(
+      currentWidget = MultipleChoiceWidget(
         key: ValueKey(currentCard.term),
         definition: currentCard.definition,
         correctTerm: currentCard.term,
@@ -102,7 +110,7 @@ class _LearnPageState extends State<LearnPage> {
         child: Column(
           children: [
             Expanded(
-              child: inGame ? _setWidget() : progressWidget(),
+              child: gameStatus == GameStatus.inGame ? currentWidget : progressWidget(),
             ),
           ],
         ),
@@ -112,18 +120,25 @@ class _LearnPageState extends State<LearnPage> {
 
   List<String> _getWrongTerms(String term, String definition) {
     List<CardModel> totalList = List.from(listOfCards);
-    List<String> randomThree = [];
+    List<String> randomSelections = [];
     totalList.removeWhere((e) => e.term == term);
     int n = 0;
+    int numWrongCount = 0;
 
+    if(listOfCards.length > 3) {
+      numWrongCount = 3;
+    }
+    else {
+      numWrongCount = listOfCards.length - 1;
+    }
     //creates a loop that gets the three random values
-    while (n < 3 && totalList.isNotEmpty) {
+    while (n < numWrongCount && totalList.isNotEmpty) {
       int randomIndex = Random().nextInt(totalList.length);
-      randomThree.add(totalList.elementAt(randomIndex).term);
+      randomSelections.add(totalList.elementAt(randomIndex).term);
       totalList.removeAt(randomIndex);
       n++;
     }
-    return randomThree;
+    return randomSelections;
   }
 
   void _onClicked(bool isCorrect) {
@@ -152,9 +167,14 @@ class _LearnPageState extends State<LearnPage> {
             _setToWritingWidget();
           }
         } else {
-          setState(() {
-            inGame = false;
-          });
+            if(listOfCards.isEmpty) {
+              setState(() {
+                gameStatus = GameStatus.done;
+              });
+            }
+            else {
+              gameStatus = GameStatus.inBetween;
+            }
         }
       });
     });
@@ -185,16 +205,20 @@ class _LearnPageState extends State<LearnPage> {
           if (isCorrect) {
             listOfCards.removeAt(currentIndex);
             if (listOfCards.isEmpty) {
-              done = true;
+              gameStatus = GameStatus.done;
+            }
+            else {
+              gameStatus = GameStatus.inBetween;
             }
           }
-          inGame = false;
+         
         }
       });
     });
   }
 
   //TODO: We need to track the number of correct answers on a particular CardModel
+
   Widget progressWidget() {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -216,7 +240,7 @@ class _LearnPageState extends State<LearnPage> {
         Padding(
             padding: const EdgeInsets.all(15.0),
             child: Text("$learned Learned")),
-        done ? playAgainButton() : nextRoundButton(),
+        gameStatus == GameStatus.done ? playAgainButton() : nextRoundButton(),
       ],
     );
   }
@@ -230,7 +254,7 @@ class _LearnPageState extends State<LearnPage> {
       } else {
         _setToWritingWidget();
       }
-      inGame = true;
+      gameStatus = GameStatus.inGame;
     });
   }
 
@@ -244,8 +268,7 @@ class _LearnPageState extends State<LearnPage> {
 
       _setToMultipleChoiceWidget();
 
-      inGame = true;
-      done = false;
+      gameStatus = GameStatus.inGame;
 
       unlearned = listOfCards.length;
       learning = 0;
@@ -256,7 +279,7 @@ class _LearnPageState extends State<LearnPage> {
   void _setToMultipleChoiceWidget() {
     currentWrongTerms =
         _getWrongTerms(currentCard.term, currentCard.definition);
-    currentMultipleChoice = MultipleChoiceWidget(
+    currentWidget = MultipleChoiceWidget(
         key: ValueKey(currentCard.term),
         definition: currentCard.definition,
         correctTerm: currentCard.term,
@@ -270,11 +293,11 @@ class _LearnPageState extends State<LearnPage> {
         onWrong: () {
           _onClicked(false);
         });
-    isMultipleChoice = true;
+    typeStatus = TypeStatus.multipleChoice;
   }
 
   void _setToWritingWidget() {
-    currentWritingWidget = WritingWidget(
+    currentWidget = WritingWidget(
         key: ValueKey(currentCard.term),
         model: currentCard,
         solveForTerm: solveForTerm,
@@ -284,15 +307,7 @@ class _LearnPageState extends State<LearnPage> {
         onWrong: () {
           _onWritten(false);
         });
-    isMultipleChoice = false;
-  }
-
-  Widget _setWidget() {
-    if (isMultipleChoice) {
-      return currentMultipleChoice;
-    } else {
-      return currentWritingWidget!;
-    }
+    typeStatus = TypeStatus.writing;
   }
 
   Widget nextRoundButton() {
@@ -312,4 +327,6 @@ class _LearnPageState extends State<LearnPage> {
       ),
     );
   }
+
+  
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/deckmodel.dart';
 import '../services/database_service.dart';
-import '../services/deckprovider.dart';
+import '../services/deck_provider.dart';
 import 'createpage.dart';
 import 'deckpage.dart';
 

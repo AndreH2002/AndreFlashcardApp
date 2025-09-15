@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:revised_flashcard_application/models/cardmodel.dart';
 import '../cards/creationcard.dart';
 import '../models/deckmodel.dart';
-import '../services/deckprovider.dart';
+import '../services/deck_provider.dart';
 
 class CreatePage extends StatefulWidget {
   const CreatePage(

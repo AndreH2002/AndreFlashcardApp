@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'services/timerprovider.dart';
+import 'services/timer_provider.dart';
 
 class MatchTimer extends StatefulWidget {
   const MatchTimer({super.key});

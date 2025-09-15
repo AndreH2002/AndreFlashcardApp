@@ -70,8 +70,8 @@ class _DeckPageState extends State<DeckPage> {
                       child: Flashcard(
                         frontText: listOfCards[index].term,
                         backText: listOfCards[index].definition,
-                        frontImagePath: listOfCards[index].termImagePath,
-                        backImagePath: listOfCards[index].defImagePath,
+                        frontImageFileName: listOfCards[index].termImagePath,
+                        backImageFileName: listOfCards[index].defImagePath,
                       ),
                     ),
                   );
@@ -135,7 +135,7 @@ class _DeckPageState extends State<DeckPage> {
                   _buildNavigationOption(
                     label: 'Learn',
                     onTap: () {
-                      if (listOfCards.isNotEmpty && listOfCards.length > 4) {
+                      if (listOfCards.isNotEmpty && listOfCards.length > 1) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(

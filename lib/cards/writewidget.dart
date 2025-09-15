@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:revised_flashcard_application/models/cardmodel.dart';
 
 class WritingWidget extends StatefulWidget {
@@ -62,7 +63,12 @@ class _WritingWidgetState extends State<WritingWidget> {
                 textScaler: TextScaler.linear(2.0),
               ),
               SizedBox(height: 10),
-              imageDisplay(),
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.contain,
+                  child: _imageDisplay()
+                ),
+              ),
             ],
           ),
         ),
@@ -122,23 +128,39 @@ class _WritingWidgetState extends State<WritingWidget> {
     );
   }
 
-  Widget imageDisplay() {
-    String? imagePath = widget.solveForTerm
+  Widget _imageDisplay() {
+    String? imageName = widget.solveForTerm
         ? widget.model.defImagePath
         : widget.model.termImagePath;
 
-    if (imagePath == null) {
+    if (imageName == null) {
       return const SizedBox.shrink();
     }
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.file(
-        File(
-          imagePath,
-        ),
-        height: 150,
-        width: 150,
-      ),
+
+    return FutureBuilder(
+      future: _getImageFile(imageName),
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.waiting) {
+          return const CircularProgressIndicator();
+        }
+        if(!snapshot.hasData || snapshot.data == null) {
+          return const Icon(Icons.broken_image, size: 40, color: Colors.white);
+        }
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.file(
+            snapshot.data!,
+            height: 150,
+            width: 150,
+          ),
+        );
+      }
     );
+  }
+
+  Future<File?> _getImageFile(String filename) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/$filename');
+    return await file.exists() ? file : null;
   }
 }

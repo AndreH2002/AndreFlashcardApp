@@ -150,6 +150,7 @@ class _CreationCardState extends State<CreationCard> {
   Future<String> _saveImagePermanently(XFile image) async {
     final directory = await getApplicationDocumentsDirectory();
     final name = DateTime.now().millisecondsSinceEpoch.toString();
+    final filename = "$name.jpg";
     final newPath = '${directory.path}/$name.jpg';
     debugPrint("Picked path: ${image.path}");
     debugPrint("Exists before copy: ${await File(image.path).exists()}");
@@ -157,7 +158,7 @@ class _CreationCardState extends State<CreationCard> {
     
     await File(image.path).copy(newPath);
 
-    return name;
+    return filename;
   }
 
 // Remove image
@@ -207,9 +208,7 @@ Future<File?> _getImageFile(String filename) async {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const CircularProgressIndicator();
         }
-        if(!snapshot.hasData || snapshot.data == null) {
-          return const Icon(Icons.broken_image, size: 50);
-        }
+      
         return ClipRRect(
           borderRadius: BorderRadius.circular(8),
           child: GestureDetector(
@@ -235,7 +234,10 @@ Future<File?> _getImageFile(String filename) async {
                 ),
               );
             },
-            child: Image.file(
+            child: 
+            !snapshot.hasData || snapshot.data == null
+            ? Icon(Icons.broken_image, size: 50, color: Colors.white)
+            :Image.file(
               snapshot.data!,
               width: 80,
               height: 80,

@@ -7,7 +7,7 @@ import 'package:revised_flashcard_application/models/cardmodel.dart';
 import 'package:revised_flashcard_application/models/matchgamemodel.dart';
 import '../models/deckmodel.dart';
 
-import '../services/timerprovider.dart';
+import '../services/timer_provider.dart';
 
 class MatchPage extends StatefulWidget {
   final DeckModel deckModel;
