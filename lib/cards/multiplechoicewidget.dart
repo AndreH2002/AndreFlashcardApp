@@ -122,7 +122,7 @@ class _MultipleChoiceWidgetState extends State<MultipleChoiceWidget> {
                     isClickable = false;
                   }
                 },
-                child: choice(term),
+                child: Center(child: choice(term)),
               );
             },
           ),

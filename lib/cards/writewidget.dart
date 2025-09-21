@@ -94,16 +94,20 @@ class _WritingWidgetState extends State<WritingWidget> {
   }
 
   void _checkAnswer(String text) {
-    setState(() {
-      if (text.toLowerCase() == term.toLowerCase()) {
-        status = Status.correct;
-        widget.onCorrect();
-      } else {
-        status = Status.incorrect;
-        widget.onWrong();
-      }
-    });
-  }
+  setState(() {
+    if (_normalize(text) == _normalize(term)) {
+      status = Status.correct;
+      widget.onCorrect();
+    } else {
+      status = Status.incorrect;
+      widget.onWrong();
+    }
+  });
+}
+
+String _normalize(String s) {
+  return s.replaceAll(RegExp(r'[^a-z0-9]'), '').trim().toLowerCase();
+}
 
   Widget _correct() {
     return Row(

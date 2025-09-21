@@ -28,6 +28,7 @@ class _DeckPageState extends State<DeckPage> {
   void didChangeDependencies() {
     deckModel = widget.deckModel;
     listOfCards = deckModel.listOfCards;
+
     super.didChangeDependencies();
   }
 
@@ -144,12 +145,6 @@ class _DeckPageState extends State<DeckPage> {
                           ),
                         );
                       }
-                    },
-                  ),
-                  _buildNavigationOption(
-                    label: 'Test',
-                    onTap: () {
-                      //TODO: Add Test Page Navigation
                     },
                   ),
                   _buildNavigationOption(

@@ -131,7 +131,7 @@ class _LearnPageState extends State<LearnPage> {
     else {
       numWrongCount = listOfCards.length - 1;
     }
-    //creates a loop that gets the three random values
+    //creates a loop that gets the three random values or less if there aren't as many cards
     while (n < numWrongCount && totalList.isNotEmpty) {
       int randomIndex = Random().nextInt(totalList.length);
       randomSelections.add(totalList.elementAt(randomIndex).term);
@@ -186,7 +186,7 @@ class _LearnPageState extends State<LearnPage> {
         if (isCorrect) {
           learning--;
           learned++;
-          currentCard.learnStatus = LearnStatus.unlearned;
+          currentCard.learnStatus = LearnStatus.learned;
         }
 
         int currentIndex = listOfCards.indexOf(currentCard);
@@ -204,13 +204,14 @@ class _LearnPageState extends State<LearnPage> {
         } else {
           if (isCorrect) {
             listOfCards.removeAt(currentIndex);
-            if (listOfCards.isEmpty) {
+            
+          }
+          if (listOfCards.isEmpty) {
               gameStatus = GameStatus.done;
             }
             else {
               gameStatus = GameStatus.inBetween;
             }
-          }
          
         }
       });
@@ -247,6 +248,7 @@ class _LearnPageState extends State<LearnPage> {
 
   void _setNextRound() {
     setState(() {
+     
       listOfCards.shuffle();
       currentCard = listOfCards.first;
       if (currentCard.learnStatus == LearnStatus.unlearned) {
@@ -262,6 +264,9 @@ class _LearnPageState extends State<LearnPage> {
     setState(() {
       //reset the list
       listOfCards = List.from(widget.deckModel.listOfCards);
+       for(CardModel card in listOfCards) {
+        card.learnStatus = LearnStatus.unlearned;
+      }
       listOfCards.shuffle();
 
       currentCard = listOfCards.first;

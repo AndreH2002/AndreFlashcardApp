@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:revised_flashcard_application/cards/flashcard.dart';
 
@@ -33,6 +34,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
 
   //once its false the still learning button doesnt appear again
   bool learning = true;
+
 
   @override
   void initState() {
@@ -96,27 +98,6 @@ class _FlashcardPageState extends State<FlashcardPage> {
           ),
         ],
       ),
-      /**  
-      bottomNavigationBar: BottomAppBar(
-        color: const Color(0xFF3b038a),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IconButton(
-                onPressed: () {}, // Go back action
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-              ),
-              IconButton(
-                onPressed: () {}, // Play action
-                icon: const Icon(Icons.play_arrow, color: Colors.white),
-              ),
-            ],
-          ),
-        ),
-      ),
-      */
     );
   }
 
@@ -132,7 +113,7 @@ class _FlashcardPageState extends State<FlashcardPage> {
             builder: (context, constraints) {
               final cardHeight = constraints.maxHeight * 0.7;
               final cardWidth = constraints.maxWidth * 0.9;
-              return LongPressDraggable(
+              return Draggable(
                 data: currentCard,
                 feedback: SizedBox(
                   height: cardHeight,
@@ -313,6 +294,15 @@ class _FlashcardPageState extends State<FlashcardPage> {
       ],
     );
   }
+
+  Flashcard cardModelToFlashcard(CardModel model) {
+  return Flashcard(
+    frontText: model.term,
+    backText: model.definition,
+    frontImageFileName: model.termImagePath,
+    backImageFileName: model.defImagePath,
+  );
+}
 }
 
 class CircularChartPainter extends CustomPainter {
@@ -360,11 +350,4 @@ class CircularChartPainter extends CustomPainter {
   }
 }
 
-Flashcard cardModelToFlashcard(CardModel model) {
-  return Flashcard(
-    frontText: model.term,
-    backText: model.definition,
-    frontImageFileName: model.termImagePath,
-    backImageFileName: model.defImagePath,
-  );
-}
+
