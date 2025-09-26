@@ -15,6 +15,9 @@ dependencies:
   image_picker: ^1.1.2
   path_provider: ^2.1.5
   flutter_tts: ^4.2.3
+  amplify_flutter: ^2.6.5
+  amplify_auth_cognito: ^2.6.5
+  amplify_authenticator: ^2.3.7
 
 dev_dependencies:
   flutter_test:
