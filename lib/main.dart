@@ -1,5 +1,7 @@
+import 'package:amplify_authenticator/amplify_authenticator.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:revised_flashcard_application/services/amplifyconfig.dart';
 import 'package:revised_flashcard_application/services/tts_provider.dart';
 import 'pages/homepage.dart';
 import 'package:revised_flashcard_application/services/deck_provider.dart';
@@ -19,6 +21,12 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+
+  @override
+  void initState() {
+    super.initState();
+    AmplifyConfigService.configureAmplify();
+  }
   @override
   void dispose() {
     super.dispose();
@@ -39,8 +47,11 @@ class _MainAppState extends State<MainApp> {
           create: (context) => TtsProvider(),
         ),
       ],
-      child: const MaterialApp(
-        home: HomePage(),
+      child: Authenticator(
+        child: MaterialApp(
+          builder: Authenticator.builder(),
+          home: HomePage(),
+        ),
       ),
     );
   }
